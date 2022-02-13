@@ -6,21 +6,19 @@ import { RestaurantsModule } from './restaurants/restaurants.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { Restaurant } from './restaurants/entities/restaurant.entity';
+import { UsersModule } from './users/users.module';
+import { CommonModule } from './common/common.module';
+import { User } from './users/entities/user.entity';
+import { Common } from './common/entities/common.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       ignoreEnvFile: process.env.NODE_ENV === 'production',
-      envFilePath:
-        process.env.NODE_ENV === 'development'
-          ? '.env.development'
-          : '.env.test',
+      envFilePath: process.env.NODE_ENV === 'development' ? '.env.development' : '.env.test',
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string()
-          .valid('development', 'test', 'production')
-          .default('development')
-          .required(),
+        NODE_ENV: Joi.string().valid('development', 'test', 'production').default('development').required(),
         DATABASE_HOST: Joi.string().required(),
         DATABASE_PORT: Joi.string().required(),
         DATABASE_USERNAME: Joi.string().required(),
@@ -41,9 +39,10 @@ import { Restaurant } from './restaurants/entities/restaurant.entity';
       database: process.env.DATABASE_NAME,
       synchronize: process.env.NODE_ENV === 'production' ? false : true,
       logging: false,
-      entities: [Restaurant],
+      entities: [User],
     }),
-    RestaurantsModule,
+    CommonModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],
