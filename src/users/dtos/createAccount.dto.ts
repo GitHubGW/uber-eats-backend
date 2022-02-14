@@ -1,17 +1,9 @@
-import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
-import { IsBoolean, IsString } from 'class-validator';
+import { InputType, ObjectType, PickType } from '@nestjs/graphql';
+import { CommonOutput } from 'src/common/dtos/common.dto';
 import { User } from '../entities/user.entity';
 
 @InputType()
 export class CreateAccountInput extends PickType(User, ['email', 'password', 'role']) {}
 
 @ObjectType()
-export class CreateAccountOutput {
-  @Field((type) => Boolean)
-  @IsBoolean()
-  ok: boolean;
-
-  @Field((type) => String)
-  @IsString()
-  message: string;
-}
+export class CreateAccountOutput extends CommonOutput {}
