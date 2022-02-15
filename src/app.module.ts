@@ -1,15 +1,13 @@
 import * as Joi from 'joi';
 import { Module } from '@nestjs/common';
 import { join } from 'path';
-import { GraphQLModule } from '@nestjs/graphql';
-import { RestaurantsModule } from './restaurants/restaurants.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/entities/user.entity';
 import { ConfigModule } from '@nestjs/config';
-import { Restaurant } from './restaurants/entities/restaurant.entity';
+import { GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from './jwt/jwt.module';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
-import { User } from './users/entities/user.entity';
-import { Common } from './common/entities/common.entity';
 
 @Module({
   imports: [
@@ -24,6 +22,7 @@ import { Common } from './common/entities/common.entity';
         DATABASE_USERNAME: Joi.string().required(),
         DATABASE_PASSWORD: Joi.string().required(),
         DATABASE_NAME: Joi.string().required(),
+        JWT_SECRET_KEY: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot({
@@ -41,6 +40,7 @@ import { Common } from './common/entities/common.entity';
       logging: false,
       entities: [User],
     }),
+    JwtModule.forRoot({ jwtSecretKey: process.env.JWT_SECRET_KEY }),
     CommonModule,
     UsersModule,
   ],
