@@ -1,6 +1,9 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateAccountInput, CreateAccountOutput } from './dtos/createAccount.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
+import { SeeProfileInput, SeeProfileOutput } from './dtos/seeProfile.dto';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -8,9 +11,13 @@ import { UsersService } from './users.service';
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
-  @Query((returns) => Boolean)
-  hello() {
-    return true;
+  @Query((returns) => User)
+  @UseGuards(AuthGuard)
+  seeMe() {}
+
+  @Query((returns) => SeeProfileOutput)
+  seeProfile(@Args('input') seeProfileInput: SeeProfileInput): Promise<SeeProfileOutput> {
+    return this.usersService.seeProfile(seeProfileInput);
   }
 
   @Mutation((returns) => CreateAccountOutput)

@@ -5,10 +5,30 @@ import { Repository } from 'typeorm';
 import { CreateAccountInput, CreateAccountOutput } from './dtos/createAccount.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { User } from './entities/user.entity';
+import { JwtService } from 'src/jwt/jwt.service';
+import { SeeProfileInput, SeeProfileOutput } from './dtos/seeProfile.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async seeProfile({ id }: SeeProfileInput): Promise<SeeProfileOutput> {
+    try {
+      const foundUser: User | undefined = await this.usersRepository.findOne({ id });
+
+      if (foundUser === undefined) {
+        return { ok: false, message: '존재하지 않는 계정입니다.' };
+      }
+
+      return { ok: true, message: '프로필 보기에 성공하였습니다.', user: foundUser };
+    } catch (error) {
+      console.log('seeProfile error');
+      return { ok: false, message: '프로필 보기에 실패하였습니다.' };
+    }
+  }
 
   async createAccount({ email, password, role }: CreateAccountInput): Promise<CreateAccountOutput> {
     try {
@@ -41,7 +61,8 @@ export class UsersService {
         return { ok: false, message: '잘못된 비밀번호입니다.' };
       }
 
-      return { ok: true, message: '로그인에 성공하였습니다.', token: 'test token' };
+      const token: string | null = await this.jwtService.handleSignToken({ id: foundUser.id });
+      return { ok: true, message: '로그인에 성공하였습니다.', token };
     } catch (error) {
       console.log('login error');
       return { ok: false, message: '로그인에 실패하였습니다.' };
