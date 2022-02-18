@@ -15,6 +15,10 @@ export class UsersService {
     private readonly jwtService: JwtService,
   ) {}
 
+  seeMe(loggedInUser: User): User {
+    return loggedInUser;
+  }
+
   async seeProfile({ id }: SeeProfileInput): Promise<SeeProfileOutput> {
     try {
       const foundUser: User | undefined = await this.usersRepository.findOne({ id });

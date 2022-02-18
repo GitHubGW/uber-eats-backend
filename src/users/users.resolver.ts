@@ -1,6 +1,4 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateAccountInput, CreateAccountOutput } from './dtos/createAccount.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { SeeProfileInput, SeeProfileOutput } from './dtos/seeProfile.dto';
@@ -12,8 +10,9 @@ export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   @Query((returns) => User)
-  @UseGuards(AuthGuard)
-  seeMe() {}
+  seeMe(@Context('loggedInUser') loggedInUser: User): User {
+    return this.usersService.seeMe(loggedInUser);
+  }
 
   @Query((returns) => SeeProfileOutput)
   seeProfile(@Args('input') seeProfileInput: SeeProfileInput): Promise<SeeProfileOutput> {
