@@ -7,6 +7,7 @@ import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { User } from './entities/user.entity';
 import { JwtService } from 'src/jwt/jwt.service';
 import { SeeProfileInput, SeeProfileOutput } from './dtos/seeProfile.dto';
+import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
 
 @Injectable()
 export class UsersService {
@@ -70,6 +71,25 @@ export class UsersService {
     } catch (error) {
       console.log('login error');
       return { ok: false, message: '로그인에 실패하였습니다.' };
+    }
+  }
+
+  async editProfile({ email, password }: EditProfileInput, { id }: User): Promise<EditProfileOutput> {
+    try {
+      const foundUser: User | undefined = await this.usersRepository.findOne(id);
+
+      if (email) {
+        foundUser.email = email;
+      }
+      if (password) {
+        foundUser.password = password;
+      }
+
+      await this.usersRepository.save(foundUser);
+      return { ok: true, message: '프로필 수정에 성공하였습니다.' };
+    } catch (error) {
+      console.log('editProfile error');
+      return { ok: false, message: '프로필 수정에 실패하였습니다.' };
     }
   }
 }

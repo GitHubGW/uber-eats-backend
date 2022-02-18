@@ -1,5 +1,8 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateAccountInput, CreateAccountOutput } from './dtos/createAccount.dto';
+import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { SeeProfileInput, SeeProfileOutput } from './dtos/seeProfile.dto';
 import { User } from './entities/user.entity';
@@ -27,5 +30,14 @@ export class UsersResolver {
   @Mutation((returns) => LoginOutput)
   login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
     return this.usersService.login(loginInput);
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation((returns) => EditProfileOutput)
+  editProfile(
+    @Args('input') editProfileInput: EditProfileInput,
+    @Context('loggedInUser') loggedInUser: User,
+  ): Promise<EditProfileOutput> {
+    return this.usersService.editProfile(editProfileInput, loggedInUser);
   }
 }

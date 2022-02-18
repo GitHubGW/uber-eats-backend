@@ -12,28 +12,19 @@ export class JwtMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction): Promise<void> {
     const token: string | string[] | undefined = req.headers.token;
 
-    if (token === undefined) {
-      return next();
-    }
-
-    const payload: string | JwtPayload | null = await this.jwtService.handleVerifyToken(token.toString());
-
-    if (payload === null) {
-      return next();
-    }
-
-    if (typeof payload === 'object' && 'id' in payload) {
+    if (token !== undefined) {
       try {
-        const { user }: SeeProfileOutput = await this.usersService.seeProfile({ id: payload.id });
+        const payload: string | JwtPayload | null = await this.jwtService.handleVerifyToken(token.toString());
 
-        if (user) {
+        if (typeof payload === 'object' && 'id' in payload) {
+          const { user }: SeeProfileOutput = await this.usersService.seeProfile({ id: payload.id });
           req['loggedInUser'] = user;
-          return next();
         }
       } catch (error) {
         console.log('JwtMiddleware use error');
-        return next();
       }
     }
+
+    return next();
   }
 }
