@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 import { Common } from 'src/common/entities/common.entity';
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
@@ -26,6 +26,11 @@ export class User extends Common {
   @Column()
   @IsString()
   password: string;
+
+  @Field((type) => Boolean, { defaultValue: false })
+  @Column({ default: false })
+  @IsBoolean()
+  emailVerified: boolean;
 
   @Field((type) => Role)
   @Column({ type: 'enum', enum: Role })

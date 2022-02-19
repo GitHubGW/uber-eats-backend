@@ -8,11 +8,13 @@ import { User } from './entities/user.entity';
 import { JwtService } from 'src/jwt/jwt.service';
 import { SeeProfileInput, SeeProfileOutput } from './dtos/seeProfile.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
+import { Verification } from './entities/verification.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Verification) private readonly verificationRepository: Repository<Verification>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -22,7 +24,7 @@ export class UsersService {
 
   async seeProfile({ id }: SeeProfileInput): Promise<SeeProfileOutput> {
     try {
-      const foundUser: User | undefined = await this.usersRepository.findOne({ id });
+      const foundUser: User | undefined = await this.userRepository.findOne({ id });
 
       if (foundUser === undefined) {
         return { ok: false, message: '존재하지 않는 계정입니다.' };
@@ -37,14 +39,16 @@ export class UsersService {
 
   async createAccount({ email, password, role }: CreateAccountInput): Promise<CreateAccountOutput> {
     try {
-      const foundUser: User | undefined = await this.usersRepository.findOne({ email });
+      const foundUser: User | undefined = await this.userRepository.findOne({ email });
 
       if (foundUser) {
         return { ok: false, message: '이미 존재하는 계정입니다.' };
       }
 
-      const createdUser: User = await this.usersRepository.create({ email, password, role });
-      await this.usersRepository.save(createdUser);
+      const createdUser: User = await this.userRepository.create({ email, password, role });
+      await this.userRepository.save(createdUser);
+      const createdVerification: Verification = await this.verificationRepository.create({ user: createdUser });
+      await this.verificationRepository.save(createdVerification);
       return { ok: true, message: '계정 생성에 성공하였습니다.' };
     } catch (error) {
       console.log('createAccount error');
@@ -54,7 +58,7 @@ export class UsersService {
 
   async login({ email, password }: LoginInput): Promise<LoginOutput> {
     try {
-      const foundUser: User | undefined = await this.usersRepository.findOne({ email });
+      const foundUser: User | undefined = await this.userRepository.findOne({ email });
 
       if (foundUser === undefined) {
         return { ok: false, message: '존재하지 않는 계정입니다.' };
@@ -76,16 +80,19 @@ export class UsersService {
 
   async editProfile({ email, password }: EditProfileInput, { id }: User): Promise<EditProfileOutput> {
     try {
-      const foundUser: User | undefined = await this.usersRepository.findOne(id);
+      const foundUser: User | undefined = await this.userRepository.findOne(id);
 
       if (email) {
         foundUser.email = email;
+        foundUser.emailVerified = false;
+        const createdVerification: Verification = await this.verificationRepository.create({ user: foundUser });
+        await this.verificationRepository.save(createdVerification);
       }
       if (password) {
         foundUser.password = password;
       }
 
-      await this.usersRepository.save(foundUser);
+      await this.userRepository.save(foundUser);
       return { ok: true, message: '프로필 수정에 성공하였습니다.' };
     } catch (error) {
       console.log('editProfile error');
