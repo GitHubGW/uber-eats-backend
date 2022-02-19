@@ -41,7 +41,9 @@ export class User extends Common {
   @BeforeUpdate()
   async handleHashPassword(): Promise<void> {
     try {
-      this.password = await bcrypt.hash(this.password, 10);
+      if (this.password) {
+        this.password = await bcrypt.hash(this.password, 10);
+      }
     } catch (error) {
       console.log('handleHashPassword error');
       throw new InternalServerErrorException();

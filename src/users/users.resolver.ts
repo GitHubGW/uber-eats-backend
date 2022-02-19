@@ -5,6 +5,7 @@ import { CreateAccountInput, CreateAccountOutput } from './dtos/createAccount.dt
 import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { SeeProfileInput, SeeProfileOutput } from './dtos/seeProfile.dto';
+import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verifyEmail.dto';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -12,6 +13,7 @@ import { UsersService } from './users.service';
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(AuthGuard)
   @Query((returns) => User)
   seeMe(@Context('loggedInUser') loggedInUser: User): User {
     return this.usersService.seeMe(loggedInUser);
@@ -39,5 +41,10 @@ export class UsersResolver {
     @Context('loggedInUser') loggedInUser: User,
   ): Promise<EditProfileOutput> {
     return this.usersService.editProfile(editProfileInput, loggedInUser);
+  }
+
+  @Mutation((returns) => VerifyEmailOutput)
+  verifyEmail(@Args('input') verifyEmailInput: VerifyEmailInput): Promise<VerifyEmailOutput> {
+    return this.usersService.verifyEmail(verifyEmailInput);
   }
 }

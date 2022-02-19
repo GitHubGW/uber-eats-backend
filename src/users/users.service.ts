@@ -9,6 +9,7 @@ import { JwtService } from 'src/jwt/jwt.service';
 import { SeeProfileInput, SeeProfileOutput } from './dtos/seeProfile.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
 import { Verification } from './entities/verification.entity';
+import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verifyEmail.dto';
 
 @Injectable()
 export class UsersService {
@@ -58,7 +59,7 @@ export class UsersService {
 
   async login({ email, password }: LoginInput): Promise<LoginOutput> {
     try {
-      const foundUser: User | undefined = await this.userRepository.findOne({ email });
+      const foundUser: User | undefined = await this.userRepository.findOne({ email }, { select: ['id', 'password'] });
 
       if (foundUser === undefined) {
         return { ok: false, message: '존재하지 않는 계정입니다.' };
@@ -97,6 +98,26 @@ export class UsersService {
     } catch (error) {
       console.log('editProfile error');
       return { ok: false, message: '프로필 수정에 실패하였습니다.' };
+    }
+  }
+
+  async verifyEmail({ code }: VerifyEmailInput): Promise<VerifyEmailOutput> {
+    try {
+      const foundVerification: Verification | undefined = await this.verificationRepository.findOne(
+        { code },
+        { relations: ['user'] },
+      );
+
+      if (foundVerification === undefined) {
+        return { ok: false, message: '존재하지 않는 인증 코드입니다.' };
+      }
+
+      await this.userRepository.update(foundVerification.user.id, { emailVerified: true });
+      await this.verificationRepository.delete({ code });
+      return { ok: true, message: '이메일 인증에 성공하였습니다.' };
+    } catch (error) {
+      console.log('verifyEmail error');
+      return { ok: false, message: '이메일 인증에 실패하였습니다.' };
     }
   }
 }

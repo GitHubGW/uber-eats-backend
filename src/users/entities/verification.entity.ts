@@ -14,7 +14,7 @@ export class Verification extends Common {
   @IsString()
   code: string;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 
