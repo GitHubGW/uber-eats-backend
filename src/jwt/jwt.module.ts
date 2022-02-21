@@ -1,5 +1,5 @@
 import { DynamicModule, Global, Module } from '@nestjs/common';
-import { JwtOptions } from './interfaces/jwtOptions.interface';
+import { JwtOptions } from './interfaces/jwt.interface';
 import { JwtService } from './jwt.service';
 
 @Global()

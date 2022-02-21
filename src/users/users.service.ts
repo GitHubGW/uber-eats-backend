@@ -113,7 +113,7 @@ export class UsersService {
       }
 
       await this.userRepository.update(foundVerification.user.id, { emailVerified: true });
-      await this.verificationRepository.delete({ code });
+      await this.verificationRepository.delete({ id: foundVerification.id });
       return { ok: true, message: '이메일 인증에 성공하였습니다.' };
     } catch (error) {
       console.log('verifyEmail error');
