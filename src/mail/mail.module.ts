@@ -1,5 +1,5 @@
 import { DynamicModule, Global, Module } from '@nestjs/common';
-import { MailOptions } from './interfaces/mailOptions.interface';
+import { MailOptions } from './interfaces/mail.interface';
 import { MailService } from './mail.service';
 
 @Global()
