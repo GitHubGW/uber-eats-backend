@@ -1,0 +1,111 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  email: String!
+  username: String!
+  password: String!
+  emailVerified: Boolean!
+  role: Role!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum Role {
+  Owner
+  Customer
+  DeliveryMan
+}
+
+type CreateAccountOutput {
+  ok: Boolean!
+  message: String!
+}
+
+type EditProfileOutput {
+  ok: Boolean!
+  message: String!
+}
+
+type LoginOutput {
+  ok: Boolean!
+  message: String!
+  token: String
+}
+
+type ResetPasswordOutput {
+  ok: Boolean!
+  message: String!
+}
+
+type SeeProfileOutput {
+  ok: Boolean!
+  message: String!
+  user: User
+}
+
+type VerifyEmailOutput {
+  ok: Boolean!
+  message: String!
+}
+
+type SendPasswordResetOutput {
+  ok: Boolean!
+  message: String!
+}
+
+type Query {
+  seeMe: User!
+  seeProfile(input: SeeProfileInput!): SeeProfileOutput!
+}
+
+input SeeProfileInput {
+  id: Float!
+}
+
+type Mutation {
+  sendPasswordReset(input: SendPasswordResetInput!): SendPasswordResetOutput!
+  createAccount(input: CreateAccountInput!): CreateAccountOutput!
+  login(input: LoginInput!): LoginOutput!
+  editProfile(input: EditProfileInput!): EditProfileOutput!
+  verifyEmail(input: VerifyEmailInput!): VerifyEmailOutput!
+  resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
+}
+
+input SendPasswordResetInput {
+  email: String!
+}
+
+input CreateAccountInput {
+  email: String!
+  password: String!
+  role: Role!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input EditProfileInput {
+  email: String
+  username: String
+  password: String
+}
+
+input VerifyEmailInput {
+  code: String!
+}
+
+input ResetPasswordInput {
+  username: String!
+  password: String!
+  confirmPassword: String!
+}

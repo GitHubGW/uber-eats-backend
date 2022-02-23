@@ -4,12 +4,7 @@ export interface MailOptions {
 }
 
 export interface MailData {
-  from: string;
-  to: string;
-  subject: string;
-  template: string;
-  'v:username': string;
-  'v:code': string;
+  [key: string]: string;
 }
 
 export interface MailResponse {
