@@ -82,7 +82,7 @@ export class UsersService {
         return { ok: false, message: '잘못된 비밀번호입니다.' };
       }
 
-      const token: string | null = await this.jwtService.handleSignToken({ id: foundUser.id });
+      const token: string | null = await this.jwtService.signToken({ id: foundUser.id });
       return { ok: true, message: '로그인에 성공하였습니다.', token };
     } catch (error) {
       console.log('login error');

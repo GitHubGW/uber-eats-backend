@@ -14,7 +14,7 @@ export class JwtMiddleware implements NestMiddleware {
 
     if (token !== undefined) {
       try {
-        const payload: string | JwtPayload | null = await this.jwtService.handleVerifyToken(token.toString());
+        const payload: string | JwtPayload | null = await this.jwtService.verifyToken(token.toString());
 
         if (typeof payload === 'object' && 'id' in payload) {
           const { user }: SeeProfileOutput = await this.usersService.seeProfile({ id: payload.id });

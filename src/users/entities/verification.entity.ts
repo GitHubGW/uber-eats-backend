@@ -19,7 +19,7 @@ export class Verification extends Common {
   user: User;
 
   @BeforeInsert()
-  async handleCreateVerificationCode() {
+  async createVerificationCode() {
     const randomCode: string = uuidv4();
     this.code = randomCode.substring(0, 4).toUpperCase();
   }
