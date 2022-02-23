@@ -4,6 +4,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateAccountInput, CreateAccountOutput } from './dtos/createAccount.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
+import { ResetPasswordInput, ResetPasswordOutput } from './dtos/resetPassword.dto';
 import { SeeProfileInput, SeeProfileOutput } from './dtos/seeProfile.dto';
 import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verifyEmail.dto';
 import { User } from './entities/user.entity';
@@ -46,5 +47,10 @@ export class UsersResolver {
   @Mutation((returns) => VerifyEmailOutput)
   verifyEmail(@Args('input') verifyEmailInput: VerifyEmailInput): Promise<VerifyEmailOutput> {
     return this.usersService.verifyEmail(verifyEmailInput);
+  }
+
+  @Mutation((returns) => ResetPasswordOutput)
+  resetPassword(@Args('input') resetPasswordInput: ResetPasswordInput): Promise<ResetPasswordOutput> {
+    return this.usersService.resetPassword(resetPasswordInput);
   }
 }
