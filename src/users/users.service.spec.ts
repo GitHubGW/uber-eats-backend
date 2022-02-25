@@ -10,6 +10,7 @@ import { User } from './entities/user.entity';
 import { Verification } from './entities/verification.entity';
 import { Role } from './enums/role.enum';
 import { UsersService } from './users.service';
+import { ResetPasswordInput, ResetPasswordOutput } from './dtos/resetPassword.dto';
 
 jest.mock('bcrypt');
 
@@ -219,5 +220,52 @@ describe('UsersService', () => {
 
   describe('verifyEmail', () => {});
 
-  describe('resetPassword', () => {});
+  describe('resetPassword', () => {
+    const resetPasswordInput: ResetPasswordInput = { username: 'user', password: '1234', confirmPassword: '1234' };
+    const wrongResetPasswordInput: ResetPasswordInput = {
+      username: 'user',
+      password: '1234',
+      confirmPassword: '12345',
+    };
+
+    it('should not reset password if user does not exist', async () => {
+      const foundUser = undefined;
+      mockUserRepository.findOne.mockResolvedValue(foundUser);
+      const resetPasswordOutput: ResetPasswordOutput = await usersService.resetPassword(resetPasswordInput);
+
+      expect(mockUserRepository.findOne).toBeCalled();
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ username: resetPasswordInput.username });
+      expect(resetPasswordOutput).toEqual({ ok: false, message: '존재하지 않는 계정입니다.' });
+    });
+
+    it('should not reset password if password is not correct', async () => {
+      const foundUser = { id: 1, email: 'user@gmail.com', password: '1234' };
+      mockUserRepository.findOne.mockResolvedValue(foundUser);
+      const resetPasswordOutput: ResetPasswordOutput = await usersService.resetPassword(wrongResetPasswordInput);
+
+      expect(mockUserRepository.findOne).toBeCalled();
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ username: resetPasswordInput.username });
+      expect(resetPasswordOutput).toEqual({ ok: false, message: '비밀번호와 비밀번호 확인이 일치하지 않습니다.' });
+    });
+
+    it('should reset password if user exist and password is correct', async () => {
+      const foundUser = { id: 1, email: 'user@gmail.com', password: '1234' };
+      mockUserRepository.findOne.mockResolvedValue(foundUser);
+      const resetPasswordOutput: ResetPasswordOutput = await usersService.resetPassword(resetPasswordInput);
+
+      expect(mockUserRepository.findOne).toBeCalled();
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ username: resetPasswordInput.username });
+      expect(mockUserRepository.save).toBeCalled();
+      expect(mockUserRepository.save).toHaveBeenCalledWith(foundUser);
+      expect(resetPasswordOutput).toEqual({ ok: true, message: '비밀번호 재설정에 성공하였습니다.' });
+    });
+
+    it('should fail on exception', async () => {
+      mockUserRepository.findOne.mockRejectedValue(new Error());
+      const resetPasswordOutput: ResetPasswordOutput = await usersService.resetPassword(resetPasswordInput);
+
+      expect(mockUserRepository.findOne).toBeCalled();
+      expect(resetPasswordOutput).toEqual({ ok: false, message: '비밀번호 재설정에 실패하였습니다.' });
+    });
+  });
 });
