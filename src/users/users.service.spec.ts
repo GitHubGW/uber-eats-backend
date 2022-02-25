@@ -1,13 +1,17 @@
+import * as bcrypt from 'bcrypt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
 import { CreateAccountInput, CreateAccountOutput } from './dtos/createAccount.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { SeeProfileInput, SeeProfileOutput } from './dtos/seeProfile.dto';
 import { User } from './entities/user.entity';
 import { Verification } from './entities/verification.entity';
 import { Role } from './enums/role.enum';
 import { UsersService } from './users.service';
+
+jest.mock('bcrypt');
 
 const mockUserRepository = {
   findOne: jest.fn(),
@@ -24,7 +28,7 @@ const mockVerificationRepository = {
 };
 
 const mockJwtService = {
-  signToken: jest.fn(),
+  signToken: jest.fn(() => 'Test Token'),
   verifyToken: jest.fn(),
 };
 
@@ -83,7 +87,7 @@ describe('UsersService', () => {
       const seeProfileOutput: SeeProfileOutput = await usersService.seeProfile(seeProfileInput);
 
       expect(mockUserRepository.findOne).toBeCalled();
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ id: 1 });
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith(expect.any(Object));
       expect(seeProfileOutput).toEqual({ ok: false, message: '존재하지 않는 계정입니다.' });
     });
 
@@ -93,7 +97,7 @@ describe('UsersService', () => {
       const seeProfileOutput: SeeProfileOutput = await usersService.seeProfile(seeProfileInput);
 
       expect(mockUserRepository.findOne).toBeCalled();
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ id: 1 });
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith(expect.any(Object));
       expect(seeProfileOutput).toEqual({ ok: true, message: '프로필 보기에 성공하였습니다.', user: foundUser });
     });
 
@@ -115,7 +119,7 @@ describe('UsersService', () => {
       const createAccountOutput: CreateAccountOutput = await usersService.createAccount(createAccountInput);
 
       expect(mockUserRepository.findOne).toBeCalled();
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ email: 'user@gmail.com' });
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith(expect.any(Object));
       expect(createAccountOutput).toEqual({ ok: false, message: '이미 존재하는 계정입니다.' });
     });
 
@@ -133,14 +137,9 @@ describe('UsersService', () => {
       const createAccountOutput: CreateAccountOutput = await usersService.createAccount(createAccountInput);
 
       expect(mockUserRepository.findOne).toBeCalled();
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ email: 'user@gmail.com' });
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith(expect.any(Object));
       expect(mockUserRepository.create).toBeCalled();
-      expect(mockUserRepository.create).toHaveBeenCalledWith({
-        email: 'user@gmail.com',
-        username: 'user',
-        password: '1234',
-        role: Role.Customer,
-      });
+      expect(mockUserRepository.create).toHaveBeenCalledWith(expect.any(Object));
       expect(mockUserRepository.save).toBeCalled();
       expect(mockUserRepository.save).toHaveBeenCalledWith(createdUser);
       expect(mockVerificationRepository.create).toBeCalled();
@@ -165,7 +164,56 @@ describe('UsersService', () => {
     });
   });
 
-  describe('login', () => {});
+  describe('login', () => {
+    const loginInput: LoginInput = { email: 'user@gmail.com', password: '1234' };
+
+    it('should not login if user does not exist', async () => {
+      const foundUser = undefined;
+      mockUserRepository.findOne.mockResolvedValue(foundUser);
+      const loginOutput: LoginOutput = await usersService.login(loginInput);
+
+      expect(mockUserRepository.findOne).toBeCalled();
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith(expect.any(Object), expect.any(Object));
+      expect(loginOutput).toEqual({ ok: false, message: '존재하지 않는 계정입니다.' });
+    });
+
+    it('should not login if password is not correct', async () => {
+      const foundUser = { id: 1, email: 'user@gmail.com', password: '1234' };
+      mockUserRepository.findOne.mockResolvedValue(foundUser);
+      jest.spyOn(bcrypt, 'compare').mockImplementation(() => false);
+      const loginOutput: LoginOutput = await usersService.login(loginInput);
+
+      expect(mockUserRepository.findOne).toBeCalled();
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith(expect.any(Object), expect.any(Object));
+      expect(bcrypt.compare).toBeCalled();
+      expect(bcrypt.compare).toHaveBeenCalledWith(expect.any(String), expect.any(String));
+      expect(loginOutput).toEqual({ ok: false, message: '잘못된 비밀번호입니다.' });
+    });
+
+    it('should login if user exist and password is correct', async () => {
+      const foundUser = { id: 1, email: 'user@gmail.com', password: '1234' };
+      mockUserRepository.findOne.mockResolvedValue(foundUser);
+      jest.spyOn(bcrypt, 'compare').mockImplementation(() => true);
+      const token: string = mockJwtService.signToken();
+      const loginOutput: LoginOutput = await usersService.login(loginInput);
+
+      expect(mockUserRepository.findOne).toBeCalled();
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith(expect.any(Object), expect.any(Object));
+      expect(bcrypt.compare).toBeCalled();
+      expect(bcrypt.compare).toHaveBeenCalledWith(loginInput.password, foundUser.password);
+      expect(mockJwtService.signToken).toBeCalled();
+      expect(mockJwtService.signToken).toHaveBeenCalledWith({ id: foundUser.id });
+      expect(loginOutput).toEqual({ ok: true, message: '로그인에 성공하였습니다.', token });
+    });
+
+    it('should fail on exception', async () => {
+      mockUserRepository.findOne.mockRejectedValue(new Error());
+      const loginOutput: LoginOutput = await usersService.login(loginInput);
+
+      expect(mockUserRepository.findOne).toBeCalled();
+      expect(loginOutput).toEqual({ ok: false, message: '로그인에 실패하였습니다.' });
+    });
+  });
 
   describe('editProfile', () => {});
 
