@@ -7,7 +7,7 @@ import { JwtOptions } from './interfaces/jwt.interface';
 export class JwtService {
   constructor(@Inject('jwtOptions') private readonly jwtOptions: JwtOptions) {}
 
-  async signToken(payload: object): Promise<string | null> {
+  async signToken(payload: { id: number }): Promise<string | null> {
     try {
       const token: string = await jwt.sign(payload, this.jwtOptions.jwtSecretKey);
       return token;
