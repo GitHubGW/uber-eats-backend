@@ -1,14 +1,14 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { User } from './entities/user.entity';
+import { UsersService } from './users.service';
 import { CreateAccountInput, CreateAccountOutput } from './dtos/createAccount.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { ResetPasswordInput, ResetPasswordOutput } from './dtos/resetPassword.dto';
 import { SeeProfileInput, SeeProfileOutput } from './dtos/seeProfile.dto';
 import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verifyEmail.dto';
-import { User } from './entities/user.entity';
-import { UsersService } from './users.service';
 
 @Resolver((of) => User)
 export class UsersResolver {

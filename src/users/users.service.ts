@@ -2,16 +2,16 @@ import * as bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateAccountInput, CreateAccountOutput } from './dtos/createAccount.dto';
-import { LoginInput, LoginOutput } from './dtos/login.dto';
+import { Verification } from './entities/verification.entity';
 import { User } from './entities/user.entity';
 import { JwtService } from 'src/jwt/jwt.service';
+import { MailService } from 'src/mail/mail.service';
+import { CreateAccountInput, CreateAccountOutput } from './dtos/createAccount.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { SeeProfileInput, SeeProfileOutput } from './dtos/seeProfile.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
-import { Verification } from './entities/verification.entity';
 import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verifyEmail.dto';
 import { ResetPasswordInput, ResetPasswordOutput } from './dtos/resetPassword.dto';
-import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UsersService {

@@ -1,11 +1,11 @@
 import formData from 'form-data';
 import Mailgun from 'mailgun.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { MailData, MailOptions, MailResponse } from './interfaces/mail.interface';
-import { SendPasswordResetInput, SendPasswordResetOutput } from './dtos/sendPasswordReset.dto';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { MailData, MailOptions, MailResponse } from './interfaces/mail.interface';
+import { SendPasswordResetInput, SendPasswordResetOutput } from './dtos/sendPasswordReset.dto';
 
 @Injectable()
 export class MailService {
