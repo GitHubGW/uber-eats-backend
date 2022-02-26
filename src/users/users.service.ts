@@ -97,6 +97,12 @@ export class UsersService {
       }
 
       if (email) {
+        const countedUser: number = await this.userRepository.count({ email });
+
+        if (countedUser !== 0) {
+          return { ok: false, message: '이미 사용 중인 이메일입니다.' };
+        }
+
         foundUser.email = email;
         foundUser.emailVerified = false;
         const createdVerification: Verification = await this.verificationRepository.create({ user: foundUser });
