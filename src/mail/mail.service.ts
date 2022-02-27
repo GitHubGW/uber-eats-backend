@@ -1,11 +1,14 @@
-import formData from 'form-data';
 import Mailgun from 'mailgun.js';
+import formData from 'form-data';
+import Client from 'mailgun.js/dist/lib/client';
 import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { MailData, MailOptions, MailResponse } from './interfaces/mail.interface';
 import { SendPasswordResetInput, SendPasswordResetOutput } from './dtos/sendPasswordReset.dto';
+import { SendBillingOutput } from './dtos/sendBilling.dto';
+import { SendEmailVerificationOutput } from './dtos/sendEmailVerification.dto';
 
 @Injectable()
 export class MailService {
@@ -14,10 +17,10 @@ export class MailService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async sendEmailVerification(to: string, username: string, code: string): Promise<void> {
+  async sendEmailVerification(to: string, username: string, code: string): Promise<SendEmailVerificationOutput> {
     try {
       const mailgun: Mailgun = new Mailgun(formData);
-      const client = mailgun.client({ username: 'Uber Eats', key: this.mailOptions.mailgunApiKey });
+      const client: Client = mailgun.client({ username: 'Uber Eats', key: this.mailOptions.mailgunApiKey });
       const mailData: MailData = {
         from: 'Uber Eats <ubereats@mailgun-test.com>',
         to,
@@ -27,9 +30,10 @@ export class MailService {
         'v:code': code,
       };
       const mailResponse: MailResponse = await client.messages.create(this.mailOptions.mailgunDomainName, mailData);
-      console.log('response', mailResponse);
+      return { ok: true, message: '이메일 인증 메일 전송을 성공하였습니다.' };
     } catch (error) {
       console.log('sendEmailVerification error');
+      return { ok: false, message: '이메일 인증 메일 전송을 실패하였습니다.' };
     }
   }
 
@@ -39,10 +43,10 @@ export class MailService {
     restaurant: string,
     orderDate: string,
     orderId: string,
-  ): Promise<void> {
+  ): Promise<SendBillingOutput> {
     try {
       const mailgun: Mailgun = new Mailgun(formData);
-      const client = mailgun.client({ username: 'Uber Eats', key: this.mailOptions.mailgunApiKey });
+      const client: Client = mailgun.client({ username: 'Uber Eats', key: this.mailOptions.mailgunApiKey });
       const mailData: MailData = {
         from: 'Uber Eats <ubereats@mailgun-test.com>',
         to,
@@ -54,9 +58,10 @@ export class MailService {
         'v:orderId': orderId,
       };
       const mailResponse: MailResponse = await client.messages.create(this.mailOptions.mailgunDomainName, mailData);
-      console.log('response', mailResponse);
+      return { ok: true, message: '주문서 메일 전송을 성공하였습니다.' };
     } catch (error) {
       console.log('sendBilling error');
+      return { ok: false, message: '주문서 메일 전송을 실패하였습니다.' };
     }
   }
 
@@ -78,7 +83,6 @@ export class MailService {
         'v:username': email.split('@')[0],
       };
       const mailResponse: MailResponse = await client.messages.create(this.mailOptions.mailgunDomainName, mailData);
-      console.log('response', mailResponse);
       return { ok: true, message: '비밀번호 재설정 메일 전송을 성공하였습니다.' };
     } catch (error) {
       console.log('sendPasswordReset error');
