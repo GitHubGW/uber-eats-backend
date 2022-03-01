@@ -72,7 +72,7 @@
     "typescript": "^4.3.5"
   },
   "jest": {
-    "moduleNameMapper":{
+    "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/$1"
     },
     "moduleFileExtensions": [
