@@ -20,6 +20,10 @@ const GRAPHQL_ENDPOINT: string = '/graphql';
 const EMAIL: string = '@gmail.com';
 const PASSWORD: string = '1234';
 const ROLE: string = 'Owner';
+const NO_EMAIL: string = 'nouser@gmail.com';
+const NO_USER: string = 'nouser';
+const NEW_EMAIL: string = 'newuser@gmail.com';
+const NEW_USER: string = 'newuser';
 
 describe('UsersModule (e2e)', () => {
   let app: INestApplication;
@@ -51,7 +55,7 @@ describe('UsersModule (e2e)', () => {
         role: ROLE,
       },
     };
-    const createAccountQuery = {
+    const createAccountQuery: Query = {
       query: `
         mutation CreateAccount($input: CreateAccountInput!) {
           createAccount(input: $input) {
@@ -116,7 +120,7 @@ describe('UsersModule (e2e)', () => {
     it('should not login if user does not exist', () => {
       loginInput = {
         input: {
-          email: 'nouser@gmail.com',
+          email: NO_EMAIL,
           password: PASSWORD,
         },
       };
@@ -297,8 +301,8 @@ describe('UsersModule (e2e)', () => {
     it('should not edit profile if user does not exist', () => {
       editProfileInput = {
         input: {
-          email: 'nouser@gmail.com',
-          username: 'nouser',
+          email: NO_EMAIL,
+          username: NO_USER,
           password: PASSWORD,
         },
       };
@@ -317,7 +321,7 @@ describe('UsersModule (e2e)', () => {
       editProfileInput = {
         input: {
           email: EMAIL,
-          username: 'newuser',
+          username: NEW_USER,
           password: PASSWORD,
         },
       };
@@ -335,8 +339,8 @@ describe('UsersModule (e2e)', () => {
     it('should edit profile if user exist and email does not exist', () => {
       editProfileInput = {
         input: {
-          email: 'newuser@gmail.com',
-          username: 'newuser',
+          email: NEW_EMAIL,
+          username: NEW_USER,
           password: PASSWORD,
         },
       };
@@ -401,6 +405,84 @@ describe('UsersModule (e2e)', () => {
   });
 
   describe('resetPassword', () => {
-    it('', () => {});
+    let resetPasswordInput: Input;
+    const resetPasswordQuery = (resetPasswordInput: Input): Query => ({
+      query: `
+        mutation ResetPassword($input: ResetPasswordInput!) {
+          resetPassword(input: $input) {
+            ok
+            message
+          }
+        }
+      `,
+      variables: resetPasswordInput,
+    });
+
+    it('should not reset password if user does not exist', () => {
+      resetPasswordInput = {
+        input: {
+          username: NO_USER,
+          password: PASSWORD,
+          confirmPassword: PASSWORD,
+        },
+      };
+
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('token', token)
+        .send(resetPasswordQuery(resetPasswordInput))
+        .expect(200)
+        .expect((response: request.Response) => {
+          expect(response.body.data.resetPassword).toEqual({
+            ok: false,
+            message: '존재하지 않는 계정입니다.',
+          });
+        });
+    });
+
+    it('should not reset password if password is not correct', () => {
+      resetPasswordInput = {
+        input: {
+          username: NEW_USER,
+          password: '12345',
+          confirmPassword: '123456',
+        },
+      };
+
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('token', token)
+        .send(resetPasswordQuery(resetPasswordInput))
+        .expect(200)
+        .expect((response: request.Response) => {
+          expect(response.body.data.resetPassword).toEqual({
+            ok: false,
+            message: '비밀번호와 비밀번호 확인이 일치하지 않습니다.',
+          });
+        });
+    });
+
+    it('should reset password if user exist and password is correct', async () => {
+      const [foundUser] = await userRepository.find();
+      resetPasswordInput = {
+        input: {
+          username: foundUser.username,
+          password: '12345',
+          confirmPassword: '12345',
+        },
+      };
+
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('token', token)
+        .send(resetPasswordQuery(resetPasswordInput))
+        .expect(200)
+        .expect((response: request.Response) => {
+          expect(response.body.data.resetPassword).toEqual({
+            ok: true,
+            message: '비밀번호 재설정에 성공하였습니다.',
+          });
+        });
+    });
   });
 });

@@ -157,7 +157,7 @@ export class UsersService {
       }
 
       foundUser.password = password;
-      this.userRepository.save(foundUser);
+      await this.userRepository.save(foundUser);
       return { ok: true, message: '비밀번호 재설정에 성공하였습니다.' };
     } catch (error) {
       console.log('resetPassword error');
