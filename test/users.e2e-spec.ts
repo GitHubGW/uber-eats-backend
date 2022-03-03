@@ -12,7 +12,7 @@ interface Input {
 
 interface Query {
   query: string;
-  variables: object;
+  variables?: object;
 }
 
 const GRAPHQL_ENDPOINT: string = '/graphql';
@@ -41,8 +41,14 @@ describe('UsersModule (e2e)', () => {
   });
 
   describe('createAccount', () => {
-    let createAccountInput: Input;
-    const createAccountQuery = (createAccountInput: Input): Query => ({
+    let createAccountInput: Input = {
+      input: {
+        email: EMAIL,
+        password: PASSWORD,
+        role: ROLE,
+      },
+    };
+    const createAccountQuery = {
       query: `
         mutation CreateAccount($input: CreateAccountInput!) {
           createAccount(input: $input) {
@@ -52,20 +58,12 @@ describe('UsersModule (e2e)', () => {
         }
       `,
       variables: createAccountInput,
-    });
+    };
 
     it('should create an account if user does not exist', () => {
-      createAccountInput = {
-        input: {
-          email: EMAIL,
-          password: PASSWORD,
-          role: ROLE,
-        },
-      };
-
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
-        .send(createAccountQuery(createAccountInput))
+        .send(createAccountQuery)
         .expect(200)
         .expect((response: request.Response) => {
           expect(response.body.data.createAccount).toEqual({
@@ -86,7 +84,7 @@ describe('UsersModule (e2e)', () => {
 
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
-        .send(createAccountQuery(createAccountInput))
+        .send(createAccountQuery)
         .expect(200)
         .expect((response: request.Response) => {
           expect(response.body.data.createAccount).toEqual({
@@ -240,7 +238,43 @@ describe('UsersModule (e2e)', () => {
   });
 
   describe('seeMe', () => {
-    it('', () => {});
+    const seeMeQuery: Query = {
+      query: `
+        query SeeMe {
+          seeMe {
+            id
+            email
+          }
+        }
+      `,
+    };
+
+    it('should see me if user is logged in', async () => {
+      const [foundUser] = await userRepository.find();
+
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('token', token)
+        .send(seeMeQuery)
+        .expect(200)
+        .expect((response: request.Response) => {
+          expect(response.body.data.seeMe).toEqual({
+            id: foundUser.id,
+            email: EMAIL,
+          });
+        });
+    });
+
+    it('should not see me if user is not logged in', async () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send(seeMeQuery)
+        .expect(200)
+        .expect((response: request.Response) => {
+          expect(response.body.errors[0].message).toBe('Forbidden resource');
+          expect(response.body.data).toBeNull();
+        });
+    });
   });
 
   describe('editProfile', () => {
