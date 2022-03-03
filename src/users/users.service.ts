@@ -105,6 +105,7 @@ export class UsersService {
 
         foundUser.email = email;
         foundUser.emailVerified = false;
+        await this.verificationRepository.delete({ user: foundUser });
         const createdVerification: Verification = await this.verificationRepository.create({ user: foundUser });
         await this.verificationRepository.save(createdVerification);
         await this.mailService.sendEmailVerification(foundUser.email, foundUser.username, createdVerification.code);

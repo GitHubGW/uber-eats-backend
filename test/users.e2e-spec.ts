@@ -5,6 +5,7 @@ import { AppModule } from '../src/app.module';
 import { getConnection, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Verification } from 'src/users/entities/verification.entity';
 
 interface Input {
   [key: string]: object;
@@ -24,6 +25,7 @@ describe('UsersModule (e2e)', () => {
   let app: INestApplication;
   let token: string;
   let userRepository: Repository<User>;
+  let verificationRepository: Repository<Verification>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,6 +34,7 @@ describe('UsersModule (e2e)', () => {
 
     app = module.createNestApplication();
     userRepository = module.get<Repository<User>>(getRepositoryToken(User));
+    verificationRepository = module.get<Repository<Verification>>(getRepositoryToken(Verification));
     await app.init();
   });
 
@@ -278,11 +281,123 @@ describe('UsersModule (e2e)', () => {
   });
 
   describe('editProfile', () => {
-    it('', () => {});
+    let editProfileInput: Input;
+    const editProfileQuery = (editProfileInput: Input): Query => ({
+      query: `
+        mutation EditProfile($input: EditProfileInput!) {
+          editProfile(input: $input) {
+            ok
+            message
+          }
+        }
+      `,
+      variables: editProfileInput,
+    });
+
+    it('should not edit profile if user does not exist', () => {
+      editProfileInput = {
+        input: {
+          email: 'nouser@gmail.com',
+          username: 'nouser',
+          password: PASSWORD,
+        },
+      };
+
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send(editProfileQuery(editProfileInput))
+        .expect(200)
+        .expect((response: request.Response) => {
+          expect(response.body.errors[0].message).toBe('Forbidden resource');
+          expect(response.body.data).toBeNull();
+        });
+    });
+
+    it('should not edit profile if email exist', () => {
+      editProfileInput = {
+        input: {
+          email: EMAIL,
+          username: 'newuser',
+          password: PASSWORD,
+        },
+      };
+
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('token', token)
+        .send(editProfileQuery(editProfileInput))
+        .expect(200)
+        .expect((response: request.Response) => {
+          expect(response.body.data.editProfile).toEqual({ ok: false, message: '이미 사용 중인 이메일입니다.' });
+        });
+    });
+
+    it('should edit profile if user exist and email does not exist', () => {
+      editProfileInput = {
+        input: {
+          email: 'newuser@gmail.com',
+          username: 'newuser',
+          password: PASSWORD,
+        },
+      };
+
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('token', token)
+        .send(editProfileQuery(editProfileInput))
+        .expect(200)
+        .expect((response: request.Response) => {
+          expect(response.body.data.editProfile).toEqual({ ok: true, message: '프로필 수정에 성공하였습니다.' });
+        });
+    });
   });
 
   describe('verifyEmail', () => {
-    it('', () => {});
+    let verifyEmailInput: Input;
+    const verifyEmailQuery = (verifyEmailInput: Input): Query => ({
+      query: `
+        mutation VerifyEmail($input: VerifyEmailInput!) {
+          verifyEmail(input: $input) {
+            ok
+            message
+          }
+        }
+      `,
+      variables: verifyEmailInput,
+    });
+
+    it('should not verify email if verification code does not exist', () => {
+      verifyEmailInput = {
+        input: {
+          code: 'null',
+        },
+      };
+
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send(verifyEmailQuery(verifyEmailInput))
+        .expect(200)
+        .expect((response: request.Response) => {
+          expect(response.body.data.verifyEmail).toEqual({ ok: false, message: '존재하지 않는 인증 코드입니다.' });
+        });
+    });
+
+    it('should verify email if verification code exist', async () => {
+      const [foundVerification] = await verificationRepository.find();
+      verifyEmailInput = {
+        input: {
+          code: foundVerification.code,
+        },
+      };
+
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send(verifyEmailQuery(verifyEmailInput))
+        .expect(200)
+        .expect((response: request.Response) => {
+          expect(response.body.data.verifyEmail).toEqual({ ok: true, message: '이메일 인증에 성공하였습니다.' });
+        });
+    });
   });
 
   describe('resetPassword', () => {

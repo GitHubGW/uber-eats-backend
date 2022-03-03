@@ -257,7 +257,7 @@ describe('UsersService', () => {
       expect(editProfileOutput).toEqual({ ok: false, message: '이미 사용 중인 이메일입니다.' });
     });
 
-    it('should edit profile if user exist', async () => {
+    it('should edit profile if user exist and email does not exist', async () => {
       const foundUser = { id: 1, email: 'user@gmail.com', username: 'user', password: '1234', role: Role.Customer };
       const countedUser = 0;
       const createdVerification = { id: 1, code: 'abcd', user: foundUser };

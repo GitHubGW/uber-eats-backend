@@ -11,7 +11,7 @@ import { Role } from '../enums/role.enum';
 @Entity()
 export class User extends Common {
   @Field((type) => String)
-  @Column()
+  @Column({ unique: true })
   @IsEmail()
   email: string;
 
