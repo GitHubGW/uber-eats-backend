@@ -14,8 +14,8 @@ export class Category extends Common {
   @Length(1, 20)
   name: string;
 
-  @Field((type) => String)
-  @Column()
+  @Field((type) => String, { defaultValue: 'https://i.ibb.co/Df48zR7/dish.png' })
+  @Column({ default: 'https://i.ibb.co/Df48zR7/dish.png' })
   @IsString()
   imageUrl: string;
 

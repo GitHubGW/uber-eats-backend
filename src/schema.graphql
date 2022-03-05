@@ -21,8 +21,8 @@ type Restaurant {
   createdAt: DateTime!
   updatedAt: DateTime!
   name: String!
-  imageUrl: String!
   address: String!
+  imageUrl: String!
   category: Category
   owner: User!
 }
@@ -82,6 +82,11 @@ type SendPasswordResetOutput {
   message: String!
 }
 
+type CreateRestaurantOutput {
+  ok: Boolean!
+  message: String!
+}
+
 type Query {
   seeMe: User!
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
@@ -98,6 +103,7 @@ type Mutation {
   editProfile(input: EditProfileInput!): EditProfileOutput!
   verifyEmail(input: VerifyEmailInput!): VerifyEmailOutput!
   resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
+  createRestaurant(input: CreateRestaurantInput!): CreateRestaurantOutput!
 }
 
 input SendPasswordResetInput {
@@ -129,4 +135,11 @@ input ResetPasswordInput {
   username: String!
   password: String!
   confirmPassword: String!
+}
+
+input CreateRestaurantInput {
+  name: String!
+  address: String!
+  imageUrl: String!
+  categoryName: String!
 }

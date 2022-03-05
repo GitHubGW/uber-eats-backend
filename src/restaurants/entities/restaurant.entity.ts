@@ -18,12 +18,12 @@ export class Restaurant extends Common {
   @Field((type) => String)
   @Column()
   @IsString()
-  imageUrl: string;
+  address: string;
 
   @Field((type) => String)
   @Column()
   @IsString()
-  address: string;
+  imageUrl: string;
 
   @Field((type) => Category, { nullable: true })
   @ManyToOne(() => Category, (category) => category.restaurants, { nullable: true, onDelete: 'SET NULL' })
