@@ -2,6 +2,31 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Category {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  imageUrl: String!
+  restaurants: [Restaurant!]!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Restaurant {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  imageUrl: String!
+  address: String!
+  category: Category
+  owner: User!
+}
+
 type User {
   id: Float!
   createdAt: DateTime!
@@ -11,17 +36,13 @@ type User {
   password: String!
   emailVerified: Boolean!
   role: Role!
+  restaurants: [Restaurant!]!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 enum Role {
   Owner
   Customer
-  DeliveryMan
+  Driver
 }
 
 type CreateAccountOutput {

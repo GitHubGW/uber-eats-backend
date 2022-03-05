@@ -1,10 +1,11 @@
 import * as bcrypt from 'bcrypt';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { IsBoolean, IsEmail, IsEnum, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 import { Common } from 'src/common/entities/common.entity';
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
-import { InternalServerErrorException } from '@nestjs/common';
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
+import { InternalServerErrorException, Res } from '@nestjs/common';
 import { Role } from '../enums/role.enum';
+import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 
 @InputType({ isAbstract: true })
 @ObjectType()
@@ -34,6 +35,11 @@ export class User extends Common {
   @Column({ type: 'enum', enum: Role })
   @IsEnum(Role)
   role: Role;
+
+  @Field((type) => [Restaurant])
+  @OneToMany(() => Restaurant, (restaurant) => restaurant.owner)
+  @IsOptional()
+  restaurants?: Restaurant[];
 
   @BeforeInsert()
   @BeforeUpdate()
