@@ -43,6 +43,7 @@ enum Role {
   Owner
   Customer
   Driver
+  Any
 }
 
 type CreateAccountOutput {

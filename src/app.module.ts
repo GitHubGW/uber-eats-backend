@@ -12,6 +12,11 @@ import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
+import { Restaurant } from './restaurants/entities/restaurant.entity';
+import { Category } from './restaurants/entities/category.entity';
+import { RestaurantsModule } from './restaurants/restaurants.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/auth.guard';
 
 @Module({
   imports: [
@@ -47,7 +52,7 @@ import { MailModule } from './mail/mail.module';
       database: process.env.DATABASE_NAME,
       synchronize: process.env.NODE_ENV === 'production' ? false : true,
       logging: false,
-      entities: [User, Verification],
+      entities: [User, Verification, Restaurant, Category],
     }),
     JwtModule.forRoot({
       jwtSecretKey: process.env.JWT_SECRET_KEY,
@@ -59,9 +64,10 @@ import { MailModule } from './mail/mail.module';
     CommonModule,
     UsersModule,
     AuthModule,
+    RestaurantsModule,
   ],
+  providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
   controllers: [],
-  providers: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
