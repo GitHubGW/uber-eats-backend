@@ -5,9 +5,8 @@ import { Repository } from 'typeorm';
 import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/createRestaurant.dto';
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dtos/deleteRestaurant.dto';
 import { EditRestaurantInput, EditRestaurantOutput } from './dtos/editRestaurant.dto';
-import { Category } from './entities/category.entity';
+import { Category } from '../categories/entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
-import { CategoryRepository } from './repositories/category.repository';
 
 @Injectable()
 export class RestaurantsService {

@@ -9,6 +9,7 @@ type Category {
   name: String!
   imageUrl: String!
   restaurants: [Restaurant!]!
+  totalRestaurants: Float!
 }
 
 """
@@ -99,9 +100,16 @@ type DeleteRestaurantOutput {
   message: String!
 }
 
+type SeeAllCategoriesOutput {
+  ok: Boolean!
+  message: String!
+  category: [Category!]
+}
+
 type Query {
   seeMe: User!
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
+  seeAllCategories: SeeAllCategoriesOutput!
 }
 
 input SeeProfileInput {

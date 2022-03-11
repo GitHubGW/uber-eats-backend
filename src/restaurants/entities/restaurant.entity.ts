@@ -3,7 +3,7 @@ import { IsNumber, IsOptional, IsString, Length } from 'class-validator';
 import { Common } from 'src/common/entities/common.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
-import { Category } from './category.entity';
+import { Category } from '../../categories/entities/category.entity';
 
 @InputType({ isAbstract: true })
 @ObjectType()
