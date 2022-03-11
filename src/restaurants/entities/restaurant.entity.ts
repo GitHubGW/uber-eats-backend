@@ -1,8 +1,8 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { IsOptional, IsString, Length } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Length } from 'class-validator';
 import { Common } from 'src/common/entities/common.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
 import { Category } from './category.entity';
 
 @InputType({ isAbstract: true })
@@ -31,6 +31,11 @@ export class Restaurant extends Common {
   category?: Category;
 
   @Field((type) => User)
-  @ManyToOne(() => User, (user) => user.restaurants)
+  @ManyToOne(() => User, (user) => user.restaurants, { onDelete: 'CASCADE' })
   owner: User;
+
+  @Field((type) => Number)
+  @RelationId((restaurant: Restaurant) => restaurant.owner)
+  @IsNumber()
+  ownerId: number;
 }
