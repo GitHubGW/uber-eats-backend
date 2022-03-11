@@ -13,10 +13,11 @@ import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { Restaurant } from './restaurants/entities/restaurant.entity';
-import { Category } from './restaurants/entities/category.entity';
+import { Category } from './categories/entities/category.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/auth.guard';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { AuthGuard } from './auth/auth.guard';
     UsersModule,
     AuthModule,
     RestaurantsModule,
+    CategoriesModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
   controllers: [],
