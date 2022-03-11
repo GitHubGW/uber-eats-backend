@@ -94,6 +94,11 @@ type EditRestaurantOutput {
   message: String!
 }
 
+type DeleteRestaurantOutput {
+  ok: Boolean!
+  message: String!
+}
+
 type Query {
   seeMe: User!
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
@@ -112,6 +117,7 @@ type Mutation {
   resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
   createRestaurant(input: CreateRestaurantInput!): CreateRestaurantOutput!
   editRestaurant(input: EditRestaurantInput!): EditRestaurantOutput!
+  deleteRestaurant(input: DeleteRestaurantInput!): DeleteRestaurantOutput!
 }
 
 input SendPasswordResetInput {
@@ -157,5 +163,9 @@ input EditRestaurantInput {
   address: String
   imageUrl: String
   categoryName: String
+  restaurantId: Float!
+}
+
+input DeleteRestaurantInput {
   restaurantId: Float!
 }

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/createRestaurant.dto';
+import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dtos/deleteRestaurant.dto';
 import { EditRestaurantInput, EditRestaurantOutput } from './dtos/editRestaurant.dto';
 import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
@@ -20,6 +21,12 @@ export class RestaurantsService {
     loggedInUser: User,
   ): Promise<CreateRestaurantOutput> {
     try {
+      const foundRestaurant: Restaurant | undefined = await this.restaurantsRepository.findOne({ name });
+
+      if (foundRestaurant) {
+        return { ok: false, message: '이미 존재하는 레스토랑입니다.' };
+      }
+
       const createdRestaurant: Restaurant = this.restaurantsRepository.create({ name, address, imageUrl });
       createdRestaurant.owner = loggedInUser;
       const foundCategory: Category | undefined = await this.categoryRepository.findOne({ name: categoryName });
@@ -80,6 +87,26 @@ export class RestaurantsService {
     } catch (error) {
       console.log('editRestaurant error');
       return { ok: false, message: '레스토랑 수정에 실패하였습니다.' };
+    }
+  }
+
+  async deleteRestaurant({ restaurantId }: DeleteRestaurantInput, loggedInUser: User): Promise<DeleteRestaurantOutput> {
+    try {
+      const foundRestaurant: Restaurant | undefined = await this.restaurantsRepository.findOne({ id: restaurantId });
+
+      if (foundRestaurant === undefined) {
+        return { ok: false, message: '존재하지 않는 레스토랑입니다.' };
+      }
+
+      if (foundRestaurant.ownerId !== loggedInUser.id) {
+        return { ok: false, message: '삭제할 수 없는 레스토랑입니다.' };
+      }
+
+      await this.restaurantsRepository.delete(restaurantId);
+      return { ok: true, message: '레스토랑 삭제에 성공하였습니다.' };
+    } catch (error) {
+      console.log('deleteRestaurant error');
+      return { ok: false, message: '레스토랑 삭제에 실패하였습니다.' };
     }
   }
 }
