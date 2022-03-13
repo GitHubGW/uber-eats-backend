@@ -106,14 +106,25 @@ type SeeAllCategoriesOutput {
   category: [Category!]
 }
 
+type SeeCategoryOutput {
+  ok: Boolean!
+  message: String!
+  category: Category
+}
+
 type Query {
   seeMe: User!
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
   seeAllCategories: SeeAllCategoriesOutput!
+  seeCategory(input: SeeCategoryInput!): SeeCategoryOutput!
 }
 
 input SeeProfileInput {
   id: Float!
+}
+
+input SeeCategoryInput {
+  categoryName: String!
 }
 
 type Mutation {
