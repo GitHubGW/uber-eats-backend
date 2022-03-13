@@ -33,18 +33,29 @@ export class CategoriesService {
     }
   }
 
-  async seeCategory({ categoryName }: SeeCategoryInput): Promise<SeeCategoryOutput> {
+  async seeCategory({ categoryName, page }: SeeCategoryInput): Promise<SeeCategoryOutput> {
     try {
-      const foundCategory: Category | undefined = await this.categoryRepository.findOne(
-        { name: categoryName },
-        { relations: ['restaurants'] },
-      );
+      const TAKE_NUMBER = 5;
+      const foundCategory: Category | undefined = await this.categoryRepository.findOne({ name: categoryName });
 
       if (foundCategory === undefined) {
         return { ok: false, message: '존재하지 않는 카테고리입니다.' };
       }
 
-      return { ok: true, message: '카테고리 보기에 성공하였습니다.', category: foundCategory };
+      const countedRestaurants: number = await this.restaurantsRepository.count({ category: foundCategory });
+      const foundRestaurants: Restaurant[] = await this.restaurantsRepository.find({
+        where: { category: foundCategory },
+        skip: (page - 1) * TAKE_NUMBER,
+        take: TAKE_NUMBER,
+      });
+      foundCategory.restaurants = foundRestaurants;
+
+      return {
+        ok: true,
+        message: '카테고리 보기에 성공하였습니다.',
+        category: foundCategory,
+        totalPages: Math.ceil(countedRestaurants / TAKE_NUMBER),
+      };
     } catch (error) {
       console.log('seeCategory error');
       return { ok: false, message: '카테고리 보기에 실패하였습니다.' };

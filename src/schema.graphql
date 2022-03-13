@@ -109,6 +109,7 @@ type SeeAllCategoriesOutput {
 type SeeCategoryOutput {
   ok: Boolean!
   message: String!
+  totalPages: Float
   category: Category
 }
 
@@ -124,6 +125,7 @@ input SeeProfileInput {
 }
 
 input SeeCategoryInput {
+  page: Float = 1
   categoryName: String!
 }
 
