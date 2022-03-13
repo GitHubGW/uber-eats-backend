@@ -15,4 +15,9 @@ export class PaginationOutput extends CommonOutput {
   @IsNumber()
   @IsOptional()
   totalPages?: number;
+
+  @Field((type) => Number, { nullable: true })
+  @IsNumber()
+  @IsOptional()
+  totalRestaurants?: number;
 }

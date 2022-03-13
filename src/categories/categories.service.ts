@@ -55,6 +55,7 @@ export class CategoriesService {
         message: '카테고리 보기에 성공하였습니다.',
         category: foundCategory,
         totalPages: Math.ceil(countedRestaurants / TAKE_NUMBER),
+        totalRestaurants: countedRestaurants,
       };
     } catch (error) {
       console.log('seeCategory error');

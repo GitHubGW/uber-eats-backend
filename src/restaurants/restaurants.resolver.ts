@@ -1,4 +1,4 @@
-import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Context, Query, Mutation, Resolver } from '@nestjs/graphql';
 import { Roles } from 'src/auth/roles.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/role.enum';
@@ -7,10 +7,16 @@ import { RestaurantsService } from './restaurants.service';
 import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/createRestaurant.dto';
 import { EditRestaurantInput, EditRestaurantOutput } from './dtos/editRestaurant.dto';
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dtos/deleteRestaurant.dto';
+import { SeeAllRestaurantsInput, SeeAllRestaurantsOutput } from './dtos/seeAllRestaurants.dto';
 
 @Resolver((of) => Restaurant)
 export class RestaurantsResolver {
   constructor(private readonly restaurantsService: RestaurantsService) {}
+
+  @Query((returns) => SeeAllRestaurantsOutput)
+  seeAllRestaurants(@Args('input') seeAllRestaurantsInput: SeeAllRestaurantsInput): Promise<SeeAllRestaurantsOutput> {
+    return this.restaurantsService.seeAllRestaurants(seeAllRestaurantsInput);
+  }
 
   @Roles([Role.Owner])
   @Mutation((returns) => CreateRestaurantOutput)

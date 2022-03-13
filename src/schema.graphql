@@ -100,6 +100,14 @@ type DeleteRestaurantOutput {
   message: String!
 }
 
+type SeeAllRestaurantsOutput {
+  ok: Boolean!
+  message: String!
+  totalPages: Float
+  totalRestaurants: Float
+  restaurants: [Restaurant!]
+}
+
 type SeeAllCategoriesOutput {
   ok: Boolean!
   message: String!
@@ -110,18 +118,24 @@ type SeeCategoryOutput {
   ok: Boolean!
   message: String!
   totalPages: Float
+  totalRestaurants: Float
   category: Category
 }
 
 type Query {
   seeMe: User!
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
+  seeAllRestaurants(input: SeeAllRestaurantsInput!): SeeAllRestaurantsOutput!
   seeAllCategories: SeeAllCategoriesOutput!
   seeCategory(input: SeeCategoryInput!): SeeCategoryOutput!
 }
 
 input SeeProfileInput {
   id: Float!
+}
+
+input SeeAllRestaurantsInput {
+  page: Float = 1
 }
 
 input SeeCategoryInput {

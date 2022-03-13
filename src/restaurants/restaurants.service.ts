@@ -7,6 +7,7 @@ import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dtos/deleteRest
 import { EditRestaurantInput, EditRestaurantOutput } from './dtos/editRestaurant.dto';
 import { Category } from '../categories/entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
+import { SeeAllRestaurantsInput, SeeAllRestaurantsOutput } from './dtos/seeAllRestaurants.dto';
 
 @Injectable()
 export class RestaurantsService {
@@ -14,6 +15,28 @@ export class RestaurantsService {
     @InjectRepository(Restaurant) private readonly restaurantsRepository: Repository<Restaurant>,
     @InjectRepository(Category) private readonly categoryRepository: Repository<Category>,
   ) {}
+
+  async seeAllRestaurants({ page }: SeeAllRestaurantsInput): Promise<SeeAllRestaurantsOutput> {
+    try {
+      const TAKE_NUMBER = 5;
+      const countedRestaurants: number = await this.restaurantsRepository.count();
+      const foundAllRestaurants: Restaurant[] = await this.restaurantsRepository.find({
+        skip: (page - 1) * TAKE_NUMBER,
+        take: TAKE_NUMBER,
+      });
+
+      return {
+        ok: true,
+        message: '전체 레스토랑 보기에 성공하였습니다.',
+        restaurants: foundAllRestaurants,
+        totalPages: Math.ceil(countedRestaurants / TAKE_NUMBER),
+        totalRestaurants: countedRestaurants,
+      };
+    } catch (error) {
+      console.log('seeAllRestaurants error');
+      return { ok: false, message: '전체 레스토랑 보기에 실패하였습니다.' };
+    }
+  }
 
   async createRestaurant(
     { name, address, imageUrl, categoryName }: CreateRestaurantInput,
