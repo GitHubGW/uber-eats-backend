@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { IsBoolean, IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
 import { Common } from 'src/common/entities/common.entity';
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import { InternalServerErrorException, Res } from '@nestjs/common';
@@ -14,11 +14,13 @@ export class User extends Common {
   @Field((type) => String)
   @Column({ unique: true })
   @IsEmail()
+  @Length(1, 30)
   email: string;
 
   @Field((type) => String)
   @Column()
   @IsString()
+  @Length(1, 20)
   username: string;
 
   @Field((type) => String)
@@ -37,7 +39,7 @@ export class User extends Common {
   role: Role;
 
   @Field((type) => [Restaurant])
-  @OneToMany(() => Restaurant, (restaurant) => restaurant.owner)
+  @OneToMany(() => Restaurant, (restaurant: Restaurant) => restaurant.owner)
   @IsOptional()
   restaurants?: Restaurant[];
 

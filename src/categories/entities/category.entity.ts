@@ -20,6 +20,6 @@ export class Category extends Common {
   imageUrl: string;
 
   @Field((type) => [Restaurant])
-  @OneToMany(() => Restaurant, (restaurant) => restaurant.category)
+  @OneToMany(() => Restaurant, (restaurant: Restaurant) => restaurant.category)
   restaurants: Restaurant[];
 }
