@@ -9,6 +9,7 @@ import { EditRestaurantInput, EditRestaurantOutput } from './dtos/editRestaurant
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dtos/deleteRestaurant.dto';
 import { SeeAllRestaurantsInput, SeeAllRestaurantsOutput } from './dtos/seeAllRestaurants.dto';
 import { SeeRestaurantInput, SeeRestaurantOutput } from './dtos/seeRestaurant.dto';
+import { SearchRestaurantsInput, SearchRestaurantsOutput } from './dtos/searchRestaurants.dto';
 
 @Resolver((of) => Restaurant)
 export class RestaurantsResolver {
@@ -22,6 +23,11 @@ export class RestaurantsResolver {
   @Query((returns) => SeeRestaurantOutput)
   seeRestaurant(@Args('input') seeRestaurantInput: SeeRestaurantInput): Promise<SeeRestaurantOutput> {
     return this.restaurantsService.seeRestaurant(seeRestaurantInput);
+  }
+
+  @Query((returns) => SearchRestaurantsOutput)
+  searchRestaurants(@Args('input') searchRestaurantsInput: SearchRestaurantsInput): Promise<SearchRestaurantsOutput> {
+    return this.restaurantsService.searchRestaurants(searchRestaurantsInput);
   }
 
   @Roles([Role.Owner])

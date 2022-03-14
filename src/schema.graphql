@@ -114,6 +114,14 @@ type SeeRestaurantOutput {
   restaurant: Restaurant
 }
 
+type SearchRestaurantsOutput {
+  ok: Boolean!
+  message: String!
+  totalPages: Float
+  totalRestaurants: Float
+  restaurants: [Restaurant!]
+}
+
 type SeeAllCategoriesOutput {
   ok: Boolean!
   message: String!
@@ -133,6 +141,7 @@ type Query {
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
   seeAllRestaurants(input: SeeAllRestaurantsInput!): SeeAllRestaurantsOutput!
   seeRestaurant(input: SeeRestaurantInput!): SeeRestaurantOutput!
+  searchRestaurants(input: SearchRestaurantsInput!): SearchRestaurantsOutput!
   seeAllCategories: SeeAllCategoriesOutput!
   seeCategory(input: SeeCategoryInput!): SeeCategoryOutput!
 }
@@ -147,6 +156,11 @@ input SeeAllRestaurantsInput {
 
 input SeeRestaurantInput {
   restaurantId: Float!
+}
+
+input SearchRestaurantsInput {
+  page: Float = 1
+  restaurantName: String!
 }
 
 input SeeCategoryInput {

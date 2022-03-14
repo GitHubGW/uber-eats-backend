@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { ILike, Like, Raw, Repository } from 'typeorm';
 import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/createRestaurant.dto';
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dtos/deleteRestaurant.dto';
 import { EditRestaurantInput, EditRestaurantOutput } from './dtos/editRestaurant.dto';
@@ -9,6 +9,7 @@ import { Category } from '../categories/entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { SeeAllRestaurantsInput, SeeAllRestaurantsOutput } from './dtos/seeAllRestaurants.dto';
 import { SeeRestaurantInput, SeeRestaurantOutput } from './dtos/seeRestaurant.dto';
+import { SearchRestaurantsInput, SearchRestaurantsOutput } from './dtos/searchRestaurants.dto';
 
 @Injectable()
 export class RestaurantsService {
@@ -19,7 +20,7 @@ export class RestaurantsService {
 
   async seeAllRestaurants({ page }: SeeAllRestaurantsInput): Promise<SeeAllRestaurantsOutput> {
     try {
-      const TAKE_NUMBER: number = 5;
+      const TAKE_NUMBER: number = 6;
       const countedRestaurants: number = await this.restaurantsRepository.count();
       const foundAllRestaurants: Restaurant[] = await this.restaurantsRepository.find({
         skip: (page - 1) * TAKE_NUMBER,
@@ -51,6 +52,29 @@ export class RestaurantsService {
     } catch (error) {
       console.log('seeRestaurant error');
       return { ok: false, message: '레스토랑 보기에 실패하였습니다.' };
+    }
+  }
+
+  async searchRestaurants({ restaurantName, page }: SearchRestaurantsInput): Promise<SearchRestaurantsOutput> {
+    try {
+      const TAKE_NUMBER: number = 6;
+      const countedRestaurants: number = await this.restaurantsRepository.count({ name: Like(`%${restaurantName}%`) });
+      const foundRestaurants: Restaurant[] = await this.restaurantsRepository.find({
+        where: { name: ILike(`%${restaurantName}%`) },
+        skip: (page - 1) * TAKE_NUMBER,
+        take: TAKE_NUMBER,
+      });
+
+      return {
+        ok: true,
+        message: '레스토랑 검색에 성공하였습니다.',
+        restaurants: foundRestaurants,
+        totalPages: Math.ceil(countedRestaurants / TAKE_NUMBER),
+        totalRestaurants: countedRestaurants,
+      };
+    } catch (error) {
+      console.log('searchRestaurants error');
+      return { ok: false, message: '레스토랑 검색에 실패하였습니다.' };
     }
   }
 

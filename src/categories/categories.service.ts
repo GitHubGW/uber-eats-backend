@@ -35,7 +35,7 @@ export class CategoriesService {
 
   async seeCategory({ categoryName, page }: SeeCategoryInput): Promise<SeeCategoryOutput> {
     try {
-      const TAKE_NUMBER: number = 5;
+      const TAKE_NUMBER: number = 6;
       const foundCategory: Category | undefined = await this.categoryRepository.findOne({ name: categoryName });
 
       if (foundCategory === undefined) {
