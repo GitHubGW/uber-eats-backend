@@ -8,6 +8,7 @@ import { EditRestaurantInput, EditRestaurantOutput } from './dtos/editRestaurant
 import { Category } from '../categories/entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { SeeAllRestaurantsInput, SeeAllRestaurantsOutput } from './dtos/seeAllRestaurants.dto';
+import { SeeRestaurantInput, SeeRestaurantOutput } from './dtos/seeRestaurant.dto';
 
 @Injectable()
 export class RestaurantsService {
@@ -18,7 +19,7 @@ export class RestaurantsService {
 
   async seeAllRestaurants({ page }: SeeAllRestaurantsInput): Promise<SeeAllRestaurantsOutput> {
     try {
-      const TAKE_NUMBER = 5;
+      const TAKE_NUMBER: number = 5;
       const countedRestaurants: number = await this.restaurantsRepository.count();
       const foundAllRestaurants: Restaurant[] = await this.restaurantsRepository.find({
         skip: (page - 1) * TAKE_NUMBER,
@@ -35,6 +36,21 @@ export class RestaurantsService {
     } catch (error) {
       console.log('seeAllRestaurants error');
       return { ok: false, message: '전체 레스토랑 보기에 실패하였습니다.' };
+    }
+  }
+
+  async seeRestaurant({ restaurantId }: SeeRestaurantInput): Promise<SeeRestaurantOutput> {
+    try {
+      const foundRestaurant: Restaurant | undefined = await this.restaurantsRepository.findOne(restaurantId);
+
+      if (foundRestaurant === undefined) {
+        return { ok: false, message: '존재하지 않는 레스토랑입니다.' };
+      }
+
+      return { ok: true, message: '레스토랑 보기에 성공하였습니다.', restaurant: foundRestaurant };
+    } catch (error) {
+      console.log('seeRestaurant error');
+      return { ok: false, message: '레스토랑 보기에 실패하였습니다.' };
     }
   }
 
