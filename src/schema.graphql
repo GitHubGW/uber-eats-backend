@@ -2,6 +2,23 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Dish {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  price: Float!
+  imageUrl: String!
+  description: String
+  restaurant: Restaurant!
+  restaurantId: Float!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Category {
   id: Float!
   createdAt: DateTime!
@@ -11,11 +28,6 @@ type Category {
   restaurants: [Restaurant!]!
   totalRestaurants: Float!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Restaurant {
   id: Float!
@@ -27,6 +39,7 @@ type Restaurant {
   category: Category
   owner: User!
   ownerId: Float!
+  dishes: [Dish!]!
 }
 
 type User {

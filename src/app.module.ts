@@ -18,6 +18,8 @@ import { RestaurantsModule } from './restaurants/restaurants.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/auth.guard';
 import { CategoriesModule } from './categories/categories.module';
+import { DishesModule } from './dishes/dishes.module';
+import { Dish } from './dishes/entities/dish.entity';
 
 @Module({
   imports: [
@@ -53,7 +55,7 @@ import { CategoriesModule } from './categories/categories.module';
       database: process.env.DATABASE_NAME,
       synchronize: process.env.NODE_ENV === 'production' ? false : true,
       logging: false,
-      entities: [User, Verification, Restaurant, Category],
+      entities: [User, Verification, Restaurant, Category, Dish],
     }),
     JwtModule.forRoot({
       jwtSecretKey: process.env.JWT_SECRET_KEY,
@@ -67,6 +69,7 @@ import { CategoriesModule } from './categories/categories.module';
     AuthModule,
     RestaurantsModule,
     CategoriesModule,
+    DishesModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
   controllers: [],
