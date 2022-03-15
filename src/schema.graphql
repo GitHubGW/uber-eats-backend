@@ -2,6 +2,21 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type DishOption {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  price: Float!
+  dish: Dish
+  dishId: Float
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Dish {
   id: Float!
   createdAt: DateTime!
@@ -12,12 +27,8 @@ type Dish {
   description: String
   restaurant: Restaurant!
   restaurantId: Float!
+  dishOptions: [DishOption!]
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Category {
   id: Float!
@@ -149,6 +160,11 @@ type SeeCategoryOutput {
   category: Category
 }
 
+type CreateDishOutput {
+  ok: Boolean!
+  message: String!
+}
+
 type Query {
   seeMe: User!
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
@@ -191,6 +207,7 @@ type Mutation {
   createRestaurant(input: CreateRestaurantInput!): CreateRestaurantOutput!
   editRestaurant(input: EditRestaurantInput!): EditRestaurantOutput!
   deleteRestaurant(input: DeleteRestaurantInput!): DeleteRestaurantOutput!
+  createDish(input: CreateDishInput!): CreateDishOutput!
 }
 
 input SendPasswordResetInput {
@@ -241,4 +258,55 @@ input EditRestaurantInput {
 
 input DeleteRestaurantInput {
   restaurantId: Float!
+}
+
+input CreateDishInput {
+  name: String!
+  price: Float!
+  imageUrl: String!
+  description: String
+  restaurantId: Float!
+  dishOptions: [DishOptionInputType!]
+}
+
+input DishOptionInputType {
+  name: String!
+  price: Float!
+  dish: DishInputType
+  dishId: Float
+}
+
+input DishInputType {
+  name: String!
+  price: Float!
+  imageUrl: String!
+  description: String
+  restaurant: RestaurantInputType!
+  restaurantId: Float!
+  dishOptions: [DishOptionInputType!]
+}
+
+input RestaurantInputType {
+  name: String!
+  address: String!
+  imageUrl: String!
+  category: CategoryInputType
+  owner: UserInputType!
+  ownerId: Float!
+  dishes: [DishInputType!]!
+}
+
+input CategoryInputType {
+  name: String!
+  imageUrl: String = "https://i.ibb.co/Df48zR7/dish.png"
+  restaurants: [RestaurantInputType!]!
+}
+
+input UserInputType {
+  email: String!
+  username: String!
+  password: String!
+  emailVerified: Boolean = false
+  role: Role!
+  restaurants: [RestaurantInputType!]!
 }

@@ -42,7 +42,9 @@ export class RestaurantsService {
 
   async seeRestaurant({ restaurantId }: SeeRestaurantInput): Promise<SeeRestaurantOutput> {
     try {
-      const foundRestaurant: Restaurant | undefined = await this.restaurantsRepository.findOne(restaurantId);
+      const foundRestaurant: Restaurant | undefined = await this.restaurantsRepository.findOne(restaurantId, {
+        relations: ['dishes'],
+      });
 
       if (foundRestaurant === undefined) {
         return { ok: false, message: '존재하지 않는 레스토랑입니다.' };
