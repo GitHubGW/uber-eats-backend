@@ -2,9 +2,10 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsNumber, IsOptional, IsString, Length } from 'class-validator';
 import { Common } from 'src/common/entities/common.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
-import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
+import { DishOption } from './dishOption.entity';
 
-@InputType({ isAbstract: true })
+@InputType('DishInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class Dish extends Common {
@@ -17,7 +18,6 @@ export class Dish extends Common {
   @Field((type) => Number)
   @Column()
   @IsNumber()
-  @Length(1, 10)
   price: number;
 
   @Field((type) => String)
@@ -28,9 +28,8 @@ export class Dish extends Common {
   @Field((type) => String, { nullable: true })
   @Column()
   @IsString()
-  @IsOptional()
   @Length(1, 120)
-  description?: string;
+  description: string;
 
   @Field((type) => Restaurant)
   @ManyToOne(() => Restaurant, (restaurant: Restaurant) => restaurant.dishes, { onDelete: 'CASCADE' })
@@ -40,4 +39,9 @@ export class Dish extends Common {
   @RelationId((dish: Dish) => dish.restaurant)
   @IsNumber()
   restaurantId: number;
+
+  @Field((type) => [DishOption], { nullable: true })
+  @OneToMany(() => DishOption, (dishOption: DishOption) => dishOption.dish, { nullable: true })
+  @IsOptional()
+  dishOptions?: DishOption[];
 }
