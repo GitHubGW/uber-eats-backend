@@ -4,7 +4,7 @@ import { Common } from 'src/common/entities/common.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { Restaurant } from '../../restaurants/entities/restaurant.entity';
 
-@InputType({ isAbstract: true })
+@InputType('CategoryInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class Category extends Common {

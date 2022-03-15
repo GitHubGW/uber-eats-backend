@@ -5,7 +5,7 @@ import { Common } from 'src/common/entities/common.entity';
 import { BeforeInsert, Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { User } from './user.entity';
 
-@InputType({ isAbstract: true })
+@InputType('VerificationInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class Verification extends Common {

@@ -7,7 +7,7 @@ import { InternalServerErrorException, Res } from '@nestjs/common';
 import { Role } from '../enums/role.enum';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 
-@InputType({ isAbstract: true })
+@InputType('UserInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class User extends Common {
