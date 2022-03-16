@@ -4,6 +4,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/role.enum';
 import { DishesService } from './dishes.service';
 import { CreateDishInput, CreateDishOutput } from './dtos/createDish.dto';
+import { DeleteDishInput, DeleteDishOutput } from './dtos/deleteDish.dto';
 
 @Resolver()
 export class DishesResolver {
@@ -16,5 +17,14 @@ export class DishesResolver {
     @Context('loggedInUser') loggedInUser: User,
   ): Promise<CreateDishOutput> {
     return this.dishesService.createDish(createDishInput, loggedInUser);
+  }
+
+  @Roles([Role.Owner])
+  @Mutation((returns) => DeleteDishOutput)
+  deleteDish(
+    @Args('input') deleteDishInput: DeleteDishInput,
+    @Context('loggedInUser') loggedInUser: User,
+  ): Promise<DeleteDishOutput> {
+    return this.dishesService.deleteDish(deleteDishInput, loggedInUser);
   }
 }

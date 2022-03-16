@@ -19,7 +19,7 @@ export class DishOption extends Common {
   price: number;
 
   @Field((type) => Dish, { nullable: true })
-  @ManyToOne(() => Dish, (dish: Dish) => dish.dishOptions, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => Dish, (dish: Dish) => dish.dishOptions, { nullable: true, onDelete: 'CASCADE' })
   @IsOptional()
   dish: Dish;
 
