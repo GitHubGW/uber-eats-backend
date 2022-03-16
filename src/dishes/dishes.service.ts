@@ -5,6 +5,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateDishInput, CreateDishOutput } from './dtos/createDish.dto';
 import { DeleteDishInput, DeleteDishOutput } from './dtos/deleteDish.dto';
+import { EditDishInput, EditDishOutput } from './dtos/editDish.dto';
 import { Dish } from './entities/dish.entity';
 import { DishOption } from './entities/dishOption.entity';
 
@@ -54,6 +55,31 @@ export class DishesService {
     } catch (error) {
       console.log('createDish error');
       return { ok: false, message: '음식 생성에 실패하였습니다.' };
+    }
+  }
+
+  async editDish(
+    { dishId, name, description, price, imageUrl }: EditDishInput,
+    loggedInUser: User,
+  ): Promise<EditDishOutput> {
+    try {
+      const foundDish: Dish | undefined = await this.dishesRepository.findOne(
+        { id: dishId },
+        { relations: ['restaurant'] },
+      );
+
+      if (foundDish === undefined) {
+        return { ok: false, message: '존재하지 않는 음식입니다.' };
+      }
+      if (foundDish.restaurant.ownerId !== loggedInUser.id) {
+        return { ok: false, message: '음식을 수정할 수 없는 레스토랑입니다.' };
+      }
+
+      await this.dishesRepository.save([{ id: dishId, name, description, price, imageUrl }]);
+      return { ok: false, message: '음식 수정에 성공하였습니다.' };
+    } catch (error) {
+      console.log('editDish error');
+      return { ok: false, message: '음식 수정에 실패하였습니다.' };
     }
   }
 

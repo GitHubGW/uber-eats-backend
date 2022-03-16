@@ -5,6 +5,7 @@ import { Role } from 'src/users/enums/role.enum';
 import { DishesService } from './dishes.service';
 import { CreateDishInput, CreateDishOutput } from './dtos/createDish.dto';
 import { DeleteDishInput, DeleteDishOutput } from './dtos/deleteDish.dto';
+import { EditDishInput, EditDishOutput } from './dtos/editDish.dto';
 
 @Resolver()
 export class DishesResolver {
@@ -17,6 +18,15 @@ export class DishesResolver {
     @Context('loggedInUser') loggedInUser: User,
   ): Promise<CreateDishOutput> {
     return this.dishesService.createDish(createDishInput, loggedInUser);
+  }
+
+  @Roles([Role.Owner])
+  @Mutation((returns) => EditDishOutput)
+  editDish(
+    @Args('input') editDishInput: EditDishInput,
+    @Context('loggedInUser') loggedInUser: User,
+  ): Promise<EditDishOutput> {
+    return this.dishesService.editDish(editDishInput, loggedInUser);
   }
 
   @Roles([Role.Owner])

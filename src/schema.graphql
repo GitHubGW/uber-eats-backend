@@ -165,6 +165,16 @@ type CreateDishOutput {
   message: String!
 }
 
+type DeleteDishOutput {
+  ok: Boolean!
+  message: String!
+}
+
+type EditDishOutput {
+  ok: Boolean!
+  message: String!
+}
+
 type Query {
   seeMe: User!
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
@@ -208,6 +218,8 @@ type Mutation {
   editRestaurant(input: EditRestaurantInput!): EditRestaurantOutput!
   deleteRestaurant(input: DeleteRestaurantInput!): DeleteRestaurantOutput!
   createDish(input: CreateDishInput!): CreateDishOutput!
+  editDish(input: EditDishInput!): EditDishOutput!
+  deleteDish(input: DeleteDishInput!): DeleteDishOutput!
 }
 
 input SendPasswordResetInput {
@@ -309,4 +321,16 @@ input UserInputType {
   emailVerified: Boolean = false
   role: Role!
   restaurants: [RestaurantInputType!]!
+}
+
+input EditDishInput {
+  name: String
+  price: Float
+  imageUrl: String
+  description: String
+  dishId: Float!
+}
+
+input DeleteDishInput {
+  dishId: Float!
 }
