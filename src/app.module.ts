@@ -20,7 +20,6 @@ import { AuthGuard } from './auth/auth.guard';
 import { CategoriesModule } from './categories/categories.module';
 import { DishesModule } from './dishes/dishes.module';
 import { Dish } from './dishes/entities/dish.entity';
-import { DishOption } from './dishes/entities/dishOption.entity';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
 
@@ -58,7 +57,7 @@ import { Order } from './orders/entities/order.entity';
       database: process.env.DATABASE_NAME,
       synchronize: process.env.NODE_ENV === 'production' ? false : true,
       logging: false,
-      entities: [User, Verification, Restaurant, Category, Dish, DishOption, Order],
+      entities: [User, Verification, Restaurant, Category, Dish, Order],
     }),
     JwtModule.forRoot({
       jwtSecretKey: process.env.JWT_SECRET_KEY,

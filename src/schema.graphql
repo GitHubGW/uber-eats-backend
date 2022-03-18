@@ -3,19 +3,9 @@
 # ------------------------------------------------------
 
 type DishOption {
-  id: Float!
-  createdAt: DateTime!
-  updatedAt: DateTime!
   name: String!
-  price: Float!
-  dish: Dish
-  dishId: Float
+  extra: Float
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Dish {
   id: Float!
@@ -29,6 +19,11 @@ type Dish {
   restaurantId: Float!
   dishOptions: [DishOption!]
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Order {
   id: Float!
@@ -299,62 +294,13 @@ input CreateDishInput {
   price: Float!
   imageUrl: String!
   description: String
-  restaurantId: Float!
   dishOptions: [DishOptionInputType!]
+  restaurantId: Float!
 }
 
 input DishOptionInputType {
   name: String!
-  price: Float!
-  dish: DishInputType
-  dishId: Float
-}
-
-input DishInputType {
-  name: String!
-  price: Float!
-  imageUrl: String!
-  description: String
-  restaurant: RestaurantInputType!
-  restaurantId: Float!
-  dishOptions: [DishOptionInputType!]
-}
-
-input RestaurantInputType {
-  name: String!
-  address: String!
-  imageUrl: String!
-  category: CategoryInputType
-  owner: UserInputType!
-  ownerId: Float!
-  dishes: [DishInputType!]!
-  restaurantOrders: [OrderInputType!]!
-}
-
-input CategoryInputType {
-  name: String!
-  imageUrl: String = "https://i.ibb.co/Df48zR7/dish.png"
-  restaurants: [RestaurantInputType!]!
-}
-
-input UserInputType {
-  email: String!
-  username: String!
-  password: String!
-  emailVerified: Boolean = false
-  role: Role!
-  restaurants: [RestaurantInputType!]!
-  customerOrders: [OrderInputType!]!
-  driverOrders: [OrderInputType!]!
-}
-
-input OrderInputType {
-  restaurant: RestaurantInputType!
-  customer: UserInputType
-  driver: UserInputType
-  dishes: [DishInputType!]!
-  totalPrice: Float
-  status: Status = Pending
+  extra: Float
 }
 
 input EditDishInput {
@@ -362,6 +308,7 @@ input EditDishInput {
   price: Float
   imageUrl: String
   description: String
+  dishOptions: [DishOptionInputType!]
   dishId: Float!
 }
 
