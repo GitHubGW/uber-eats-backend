@@ -7,18 +7,16 @@ import { CreateDishInput, CreateDishOutput } from './dtos/createDish.dto';
 import { DeleteDishInput, DeleteDishOutput } from './dtos/deleteDish.dto';
 import { EditDishInput, EditDishOutput } from './dtos/editDish.dto';
 import { Dish } from './entities/dish.entity';
-import { DishOption } from './entities/dishOption.entity';
 
 @Injectable()
 export class DishesService {
   constructor(
     @InjectRepository(Dish) private readonly dishesRepository: Repository<Dish>,
-    @InjectRepository(DishOption) private readonly dishOptionsRepository: Repository<DishOption>,
     @InjectRepository(Restaurant) private readonly restaurantsRepository: Repository<Restaurant>,
   ) {}
 
   async createDish(
-    { restaurantId, name, price, imageUrl, description, dishOptions }: CreateDishInput,
+    { restaurantId, name, description, price, imageUrl, dishOptions }: CreateDishInput,
     loggedInUser: User,
   ): Promise<CreateDishOutput> {
     try {
@@ -33,24 +31,13 @@ export class DishesService {
 
       const createdDish: Dish = this.dishesRepository.create({
         name,
+        description,
         price,
         imageUrl,
-        description,
+        dishOptions,
         restaurant: foundRestaurant,
       });
       await this.dishesRepository.save(createdDish);
-
-      if (dishOptions) {
-        dishOptions.map(async (dishOption: DishOption) => {
-          const createdDishOption: DishOption = this.dishOptionsRepository.create({
-            name: dishOption.name,
-            price: dishOption.price,
-            dish: createdDish,
-          });
-          await this.dishOptionsRepository.save(createdDishOption);
-        });
-      }
-
       return { ok: true, message: '음식 생성에 성공하였습니다.' };
     } catch (error) {
       console.log('createDish error');
@@ -59,7 +46,7 @@ export class DishesService {
   }
 
   async editDish(
-    { dishId, name, description, price, imageUrl }: EditDishInput,
+    { dishId, name, description, price, imageUrl, dishOptions }: EditDishInput,
     loggedInUser: User,
   ): Promise<EditDishOutput> {
     try {
@@ -75,7 +62,7 @@ export class DishesService {
         return { ok: false, message: '음식을 수정할 수 없는 레스토랑입니다.' };
       }
 
-      await this.dishesRepository.save([{ id: dishId, name, description, price, imageUrl }]);
+      await this.dishesRepository.save([{ id: dishId, name, description, price, imageUrl, dishOptions }]);
       return { ok: false, message: '음식 수정에 성공하였습니다.' };
     } catch (error) {
       console.log('editDish error');
