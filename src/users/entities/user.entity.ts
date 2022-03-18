@@ -6,6 +6,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import { InternalServerErrorException, Res } from '@nestjs/common';
 import { Role } from '../enums/role.enum';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
+import { Order } from 'src/orders/entities/order.entity';
 
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
@@ -42,6 +43,16 @@ export class User extends Common {
   @OneToMany(() => Restaurant, (restaurant: Restaurant) => restaurant.owner)
   @IsOptional()
   restaurants?: Restaurant[];
+
+  @Field((type) => [Order])
+  @OneToMany(() => Order, (order: Order) => order.customer)
+  @IsOptional()
+  customerOrders?: Order[];
+
+  @Field((type) => [Order])
+  @OneToMany(() => Order, (order: Order) => order.driver)
+  @IsOptional()
+  driverOrders?: Order[];
 
   @BeforeInsert()
   @BeforeUpdate()

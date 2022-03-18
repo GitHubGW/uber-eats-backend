@@ -30,6 +30,25 @@ type Dish {
   dishOptions: [DishOption!]
 }
 
+type Order {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  restaurant: Restaurant!
+  customer: User
+  driver: User
+  dishes: [Dish!]!
+  totalPrice: Float
+  status: Status!
+}
+
+enum Status {
+  Pending
+  Cooking
+  PickedUp
+  Delivered
+}
+
 type Category {
   id: Float!
   createdAt: DateTime!
@@ -51,6 +70,7 @@ type Restaurant {
   owner: User!
   ownerId: Float!
   dishes: [Dish!]!
+  restaurantOrders: [Order!]!
 }
 
 type User {
@@ -63,6 +83,8 @@ type User {
   emailVerified: Boolean!
   role: Role!
   restaurants: [Restaurant!]!
+  customerOrders: [Order!]!
+  driverOrders: [Order!]!
 }
 
 enum Role {
@@ -306,6 +328,7 @@ input RestaurantInputType {
   owner: UserInputType!
   ownerId: Float!
   dishes: [DishInputType!]!
+  restaurantOrders: [OrderInputType!]!
 }
 
 input CategoryInputType {
@@ -321,6 +344,17 @@ input UserInputType {
   emailVerified: Boolean = false
   role: Role!
   restaurants: [RestaurantInputType!]!
+  customerOrders: [OrderInputType!]!
+  driverOrders: [OrderInputType!]!
+}
+
+input OrderInputType {
+  restaurant: RestaurantInputType!
+  customer: UserInputType
+  driver: UserInputType
+  dishes: [DishInputType!]!
+  totalPrice: Float
+  status: Status = Pending
 }
 
 input EditDishInput {

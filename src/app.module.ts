@@ -21,6 +21,8 @@ import { CategoriesModule } from './categories/categories.module';
 import { DishesModule } from './dishes/dishes.module';
 import { Dish } from './dishes/entities/dish.entity';
 import { DishOption } from './dishes/entities/dishOption.entity';
+import { OrdersModule } from './orders/orders.module';
+import { Order } from './orders/entities/order.entity';
 
 @Module({
   imports: [
@@ -56,7 +58,7 @@ import { DishOption } from './dishes/entities/dishOption.entity';
       database: process.env.DATABASE_NAME,
       synchronize: process.env.NODE_ENV === 'production' ? false : true,
       logging: false,
-      entities: [User, Verification, Restaurant, Category, Dish, DishOption],
+      entities: [User, Verification, Restaurant, Category, Dish, DishOption, Order],
     }),
     JwtModule.forRoot({
       jwtSecretKey: process.env.JWT_SECRET_KEY,
@@ -71,6 +73,7 @@ import { DishOption } from './dishes/entities/dishOption.entity';
     RestaurantsModule,
     CategoriesModule,
     DishesModule,
+    OrdersModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
   controllers: [],
