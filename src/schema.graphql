@@ -4,7 +4,7 @@
 
 type DishOption {
   name: String!
-  extra: Float
+  price: Float
 }
 
 type Dish {
@@ -25,14 +25,22 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type OrderItem {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  dish: Dish!
+  dishOptions: [DishOption!]
+}
+
 type Order {
   id: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
-  restaurant: Restaurant!
+  restaurant: Restaurant
   customer: User
   driver: User
-  dishes: [Dish!]!
+  orderItems: [OrderItem!]!
   totalPrice: Float
   status: Status!
 }
@@ -192,6 +200,11 @@ type EditDishOutput {
   message: String!
 }
 
+type CreateOrderOutput {
+  ok: Boolean!
+  message: String!
+}
+
 type Query {
   seeMe: User!
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
@@ -237,6 +250,7 @@ type Mutation {
   createDish(input: CreateDishInput!): CreateDishOutput!
   editDish(input: EditDishInput!): EditDishOutput!
   deleteDish(input: DeleteDishInput!): DeleteDishOutput!
+  createOrder(input: CreateOrderInput!): CreateOrderOutput!
 }
 
 input SendPasswordResetInput {
@@ -300,7 +314,7 @@ input CreateDishInput {
 
 input DishOptionInputType {
   name: String!
-  extra: Float
+  price: Float
 }
 
 input EditDishInput {
@@ -314,4 +328,14 @@ input EditDishInput {
 
 input DeleteDishInput {
   dishId: Float!
+}
+
+input CreateOrderInput {
+  restaurantId: Float!
+  items: [CreateOrderItemInput!]!
+}
+
+input CreateOrderItemInput {
+  dishId: Float!
+  dishOptions: [DishOptionInputType!]
 }

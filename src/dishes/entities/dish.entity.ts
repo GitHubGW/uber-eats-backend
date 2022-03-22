@@ -14,7 +14,7 @@ export class DishOption {
   @Field((type) => Number, { nullable: true })
   @IsNumber()
   @IsOptional()
-  extra?: number;
+  price?: number;
 }
 
 @InputType('DishInputType', { isAbstract: true })
