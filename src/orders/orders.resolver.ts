@@ -4,6 +4,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/role.enum';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/createOrder.dto';
 import { SeeAllOrdersInput, SeeAllOrdersOutput } from './dtos/seeAllOrders.dto';
+import { SeeOrderInput, SeeOrderOutput } from './dtos/seeOrder.dto';
 import { Order } from './entities/order.entity';
 import { OrdersService } from './orders.service';
 
@@ -18,6 +19,15 @@ export class OrdersResolver {
     @Context('loggedInUser') loggedInUser: User,
   ): Promise<SeeAllOrdersOutput> {
     return this.ordersService.seeAllOrders(seeAllOrdersInput, loggedInUser);
+  }
+
+  @Roles([Role.Any])
+  @Query((returns) => SeeOrderOutput)
+  seeOrder(
+    @Args('input') seeOrderInput: SeeOrderInput,
+    @Context('loggedInUser') loggedInUser: User,
+  ): Promise<SeeOrderOutput> {
+    return this.ordersService.seeOrder(seeOrderInput, loggedInUser);
   }
 
   @Roles([Role.Customer])

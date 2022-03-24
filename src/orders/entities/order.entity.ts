@@ -3,7 +3,7 @@ import { IsEnum, IsNumber, IsOptional } from 'class-validator';
 import { Common } from 'src/common/entities/common.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, RelationId } from 'typeorm';
 import { Status } from '../enums/status.enum';
 import { OrderItem } from './orderItem.entity';
 
@@ -19,15 +19,30 @@ export class Order extends Common {
   @IsOptional()
   restaurant?: Restaurant;
 
+  @Field((type) => Number)
+  @RelationId((order: Order) => order.restaurant)
+  @IsNumber()
+  restaurantId: number;
+
   @Field((type) => User, { nullable: true })
   @ManyToOne(() => User, (user: User) => user.customerOrders, { onDelete: 'SET NULL', nullable: true })
   @IsOptional()
   customer?: User;
 
+  @Field((type) => Number)
+  @RelationId((order: Order) => order.customer)
+  @IsNumber()
+  customerId: number;
+
   @Field((type) => User, { nullable: true })
   @ManyToOne(() => User, (user: User) => user.driverOrders, { onDelete: 'SET NULL', nullable: true })
   @IsOptional()
   driver?: User;
+
+  @Field((type) => Number)
+  @RelationId((order: Order) => order.driver)
+  @IsNumber()
+  driverId: number;
 
   @Field((type) => [OrderItem])
   @ManyToMany(() => OrderItem)

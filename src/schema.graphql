@@ -38,8 +38,11 @@ type Order {
   createdAt: DateTime!
   updatedAt: DateTime!
   restaurant: Restaurant
+  restaurantId: Float!
   customer: User
+  customerId: Float!
   driver: User
+  driverId: Float!
   orderItems: [OrderItem!]!
   totalPrice: Float
   status: Status!
@@ -211,6 +214,12 @@ type SeeAllOrdersOutput {
   orders: [Order!]
 }
 
+type SeeOrderOutput {
+  ok: Boolean!
+  message: String!
+  order: Order
+}
+
 type Query {
   seeMe: User!
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
@@ -220,6 +229,7 @@ type Query {
   seeAllCategories: SeeAllCategoriesOutput!
   seeCategory(input: SeeCategoryInput!): SeeCategoryOutput!
   seeAllOrders(input: SeeAllOrdersInput!): SeeAllOrdersOutput!
+  seeOrder(input: SeeOrderInput!): SeeOrderOutput!
 }
 
 input SeeProfileInput {
@@ -246,6 +256,10 @@ input SeeCategoryInput {
 
 input SeeAllOrdersInput {
   status: Status
+}
+
+input SeeOrderInput {
+  id: Float!
 }
 
 type Mutation {

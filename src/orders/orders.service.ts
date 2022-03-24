@@ -7,6 +7,7 @@ import { Role } from 'src/users/enums/role.enum';
 import { Repository } from 'typeorm';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/createOrder.dto';
 import { SeeAllOrdersInput, SeeAllOrdersOutput } from './dtos/seeAllOrders.dto';
+import { SeeOrderInput, SeeOrderOutput } from './dtos/seeOrder.dto';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/orderItem.entity';
 
@@ -49,6 +50,28 @@ export class OrdersService {
     } catch (error) {
       console.log('seeAllOrders error');
       return { ok: false, message: '전체 주문 보기에 실패하였습니다.' };
+    }
+  }
+
+  async seeOrder({ id }: SeeOrderInput, loggedInUser: User): Promise<SeeOrderOutput> {
+    try {
+      const foundOrder: Order | undefined = await this.ordersRepository.findOne({ id }, { relations: ['restaurant'] });
+
+      if (foundOrder === undefined) {
+        return { ok: false, message: '존재하지 않는 주문입니다.' };
+      }
+      if (loggedInUser.role === Role.Owner && foundOrder.restaurant.ownerId !== loggedInUser.id) {
+        throw new Error();
+      } else if (loggedInUser.role === Role.Customer && foundOrder.customerId !== loggedInUser.id) {
+        throw new Error();
+      } else if (loggedInUser.role === Role.Driver && foundOrder.driverId !== loggedInUser.id) {
+        throw new Error();
+      }
+
+      return { ok: true, message: '주문 보기에 성공하였습니다.', order: foundOrder };
+    } catch (error) {
+      console.log('seeOrder error');
+      return { ok: false, message: '주문 보기에 실패하였습니다.' };
     }
   }
 
