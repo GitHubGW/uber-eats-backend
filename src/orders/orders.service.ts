@@ -3,8 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Dish, DishOption } from 'src/dishes/entities/dish.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Role } from 'src/users/enums/role.enum';
 import { Repository } from 'typeorm';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/createOrder.dto';
+import { SeeAllOrdersInput, SeeAllOrdersOutput } from './dtos/seeAllOrders.dto';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/orderItem.entity';
 
@@ -16,6 +18,39 @@ export class OrdersService {
     @InjectRepository(Restaurant) private readonly restaurantsRepository: Repository<Restaurant>,
     @InjectRepository(Dish) private readonly dishesRepository: Repository<Dish>,
   ) {}
+
+  async seeAllOrders({ status }: SeeAllOrdersInput, loggedInUser: User): Promise<SeeAllOrdersOutput> {
+    try {
+      let foundAllOrders: Order[] = [];
+
+      switch (loggedInUser.role) {
+        case Role.Owner:
+          const foundRestaurants: Restaurant[] = await this.restaurantsRepository.find({
+            where: { owner: loggedInUser },
+            relations: ['restaurantOrders'],
+          });
+          foundAllOrders = foundRestaurants.map((restaurant: Restaurant) => restaurant.restaurantOrders).flat();
+
+          if (status) {
+            foundAllOrders = foundAllOrders.filter((foundOrder: Order) => foundOrder.status === status);
+          }
+          break;
+        case Role.Customer:
+          foundAllOrders = await this.ordersRepository.find({ customer: loggedInUser, ...(status && { status }) });
+          break;
+        case Role.Driver:
+          foundAllOrders = await this.ordersRepository.find({ driver: loggedInUser, ...(status && { status }) });
+          break;
+        default:
+          throw new Error();
+      }
+
+      return { ok: true, message: '전체 주문 보기에 성공하였습니다.', orders: foundAllOrders };
+    } catch (error) {
+      console.log('seeAllOrders error');
+      return { ok: false, message: '전체 주문 보기에 실패하였습니다.' };
+    }
+  }
 
   async createOrder({ restaurantId, items }: CreateOrderInput, loggedInUser: User): Promise<CreateOrderOutput> {
     try {

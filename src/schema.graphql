@@ -205,6 +205,12 @@ type CreateOrderOutput {
   message: String!
 }
 
+type SeeAllOrdersOutput {
+  ok: Boolean!
+  message: String!
+  orders: [Order!]
+}
+
 type Query {
   seeMe: User!
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
@@ -213,6 +219,7 @@ type Query {
   searchRestaurants(input: SearchRestaurantsInput!): SearchRestaurantsOutput!
   seeAllCategories: SeeAllCategoriesOutput!
   seeCategory(input: SeeCategoryInput!): SeeCategoryOutput!
+  seeAllOrders(input: SeeAllOrdersInput!): SeeAllOrdersOutput!
 }
 
 input SeeProfileInput {
@@ -235,6 +242,10 @@ input SearchRestaurantsInput {
 input SeeCategoryInput {
   page: Float = 1
   categoryName: String!
+}
+
+input SeeAllOrdersInput {
+  status: Status
 }
 
 type Mutation {
