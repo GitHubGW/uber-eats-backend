@@ -208,6 +208,11 @@ type CreateOrderOutput {
   message: String!
 }
 
+type EditOrderOutput {
+  ok: Boolean!
+  message: String!
+}
+
 type SeeAllOrdersOutput {
   ok: Boolean!
   message: String!
@@ -276,6 +281,7 @@ type Mutation {
   editDish(input: EditDishInput!): EditDishOutput!
   deleteDish(input: DeleteDishInput!): DeleteDishOutput!
   createOrder(input: CreateOrderInput!): CreateOrderOutput!
+  editOrder(input: EditOrderInput!): EditOrderOutput!
 }
 
 input SendPasswordResetInput {
@@ -363,4 +369,9 @@ input CreateOrderInput {
 input CreateOrderItemInput {
   dishId: Float!
   dishOptions: [DishOptionInputType!]
+}
+
+input EditOrderInput {
+  id: Float!
+  status: Status = Pending
 }

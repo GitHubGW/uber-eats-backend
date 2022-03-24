@@ -3,6 +3,7 @@ import { Roles } from 'src/auth/roles.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/role.enum';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/createOrder.dto';
+import { EditOrderInput, EditOrderOutput } from './dtos/editOrder.dto';
 import { SeeAllOrdersInput, SeeAllOrdersOutput } from './dtos/seeAllOrders.dto';
 import { SeeOrderInput, SeeOrderOutput } from './dtos/seeOrder.dto';
 import { Order } from './entities/order.entity';
@@ -37,5 +38,14 @@ export class OrdersResolver {
     @Context('loggedInUser') loggedInUser: User,
   ): Promise<CreateOrderOutput> {
     return this.ordersService.createOrder(createOrderInput, loggedInUser);
+  }
+
+  @Roles([Role.Owner, Role.Driver])
+  @Mutation((returns) => EditOrderOutput)
+  editOrder(
+    @Args('input') editOrderInput: EditOrderInput,
+    @Context('loggedInUser') loggedInUser: User,
+  ): Promise<EditOrderOutput> {
+    return this.ordersService.editOrder(editOrderInput, loggedInUser);
   }
 }

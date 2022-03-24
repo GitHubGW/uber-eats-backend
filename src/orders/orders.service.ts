@@ -6,10 +6,12 @@ import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/role.enum';
 import { Repository } from 'typeorm';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/createOrder.dto';
+import { EditOrderInput, EditOrderOutput } from './dtos/editOrder.dto';
 import { SeeAllOrdersInput, SeeAllOrdersOutput } from './dtos/seeAllOrders.dto';
 import { SeeOrderInput, SeeOrderOutput } from './dtos/seeOrder.dto';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/orderItem.entity';
+import { Status } from './enums/status.enum';
 
 @Injectable()
 export class OrdersService {
@@ -128,6 +130,49 @@ export class OrdersService {
     } catch (error) {
       console.log('createOrder error');
       return { ok: false, message: '주문 생성에 실패하였습니다.' };
+    }
+  }
+
+  async editOrder({ id, status }: EditOrderInput, loggedInUser: User): Promise<EditOrderOutput> {
+    try {
+      const foundOrder: Order | undefined = await this.ordersRepository.findOne({ id }, { relations: ['restaurant'] });
+
+      if (foundOrder === undefined) {
+        return { ok: false, message: '존재하지 않는 주문입니다.' };
+      }
+      if (loggedInUser.role === Role.Owner && foundOrder.restaurant.ownerId !== loggedInUser.id) {
+        throw new Error();
+      } else if (loggedInUser.role === Role.Driver && foundOrder.driverId !== loggedInUser.id) {
+        throw new Error();
+      }
+
+      if (loggedInUser.role === Role.Owner) {
+        if (
+          foundOrder.status === Status.PickedUp ||
+          foundOrder.status === Status.Delivered ||
+          status === Status.Pending ||
+          status === Status.Delivered
+        ) {
+          return { ok: false, message: '수정할 수 없는 주문 상태입니다.' };
+        }
+        if (foundOrder.status === Status.Pending || foundOrder.status === Status.Cooking) {
+          await this.ordersRepository.save([{ id: foundOrder.id, status }]);
+        }
+      }
+
+      if (loggedInUser.role === Role.Driver) {
+        if (foundOrder.status !== Status.PickedUp || status !== Status.Delivered) {
+          return { ok: false, message: '수정할 수 없는 주문 상태입니다.' };
+        }
+        if (foundOrder.status === Status.PickedUp) {
+          await this.ordersRepository.save([{ id: foundOrder.id, status }]);
+        }
+      }
+
+      return { ok: true, message: '주문 수정에 성공하였습니다.' };
+    } catch (error) {
+      console.log('editOrder error');
+      return { ok: false, message: '주문 수정에 실패하였습니다.' };
     }
   }
 }
