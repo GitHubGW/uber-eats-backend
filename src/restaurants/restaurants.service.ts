@@ -91,12 +91,12 @@ export class RestaurantsService {
         return { ok: false, message: '이미 존재하는 레스토랑입니다.' };
       }
 
-      const createdRestaurant: Restaurant = this.restaurantsRepository.create({ name, address, imageUrl });
+      const createdRestaurant: Restaurant = await this.restaurantsRepository.create({ name, address, imageUrl });
       createdRestaurant.owner = loggedInUser;
       const foundCategory: Category | undefined = await this.categoryRepository.findOne({ name: categoryName });
 
       if (foundCategory === undefined) {
-        const createdCategory: Category = this.categoryRepository.create({ name: categoryName });
+        const createdCategory: Category = await this.categoryRepository.create({ name: categoryName });
         await this.categoryRepository.save(createdCategory);
         createdRestaurant.category = createdCategory;
       } else {
@@ -137,7 +137,7 @@ export class RestaurantsService {
       if (categoryName) {
         const foundCategory: Category | undefined = await this.categoryRepository.findOne({ name: categoryName });
         if (foundCategory === undefined) {
-          foundOrCreatedCategory = this.categoryRepository.create({ name: categoryName });
+          foundOrCreatedCategory = await this.categoryRepository.create({ name: categoryName });
           await this.categoryRepository.save(foundOrCreatedCategory);
         } else {
           foundOrCreatedCategory = foundCategory;
