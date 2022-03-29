@@ -6,6 +6,7 @@ import { AppModule } from 'src/app.module';
 import { Category } from 'src/categories/entities/category.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { getConnection, Repository } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
 
 interface Input {
   [key: string]: object;
@@ -26,6 +27,7 @@ describe('RestaurantsModule (e2e)', () => {
   let token: string;
   let restaurantsRepository: Repository<Restaurant>;
   let categoryRepository: Repository<Category>;
+  let userRepository: Repository<User>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,6 +37,7 @@ describe('RestaurantsModule (e2e)', () => {
     app = module.createNestApplication();
     restaurantsRepository = module.get<Repository<Restaurant>>(getRepositoryToken(Restaurant));
     categoryRepository = module.get<Repository<Category>>(getRepositoryToken(Category));
+    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
     await app.init();
   });
 
@@ -92,10 +95,11 @@ describe('RestaurantsModule (e2e)', () => {
       variables: loginInput,
     });
 
-    it('should login if user exist and password is correct', () => {
+    it('should login if user exist and password is correct', async () => {
+      const [foundUser] = await userRepository.find();
       loginInput = {
         input: {
-          email: EMAIL,
+          email: foundUser.email,
           password: PASSWORD,
         },
       };

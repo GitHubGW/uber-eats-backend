@@ -100,7 +100,7 @@ describe('CategoriesService', () => {
       expect(seeCategoryOutput).toEqual({ ok: false, message: '존재하지 않는 카테고리입니다.' });
     });
 
-    it('should seee category if category exist', async () => {
+    it('should see category if category exist', async () => {
       const TAKE_NUMBER: number = 6;
       const foundCategory: Category = {
         id: 1,
