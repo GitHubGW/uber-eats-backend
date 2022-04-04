@@ -43,10 +43,19 @@ import { OrderItem } from './orders/entities/orderItem.entity';
       }),
     }),
     GraphQLModule.forRoot({
+      installSubscriptionHandlers: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.graphql'),
       playground: true,
       context: ({ req }) => {
         return { loggedInUser: req.loggedInUser };
+      },
+      subscriptions: {
+        'subscriptions-transport-ws': {
+          onConnect: (connectionParams) => {
+            return connectionParams;
+          },
+          onDisconnect: () => {},
+        },
       },
     }),
     TypeOrmModule.forRoot({
@@ -78,8 +87,4 @@ import { OrderItem } from './orders/entities/orderItem.entity';
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
   controllers: [],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(JwtMiddleware).forRoutes({ path: '/graphql', method: RequestMethod.POST });
-  }
-}
+export class AppModule {}
