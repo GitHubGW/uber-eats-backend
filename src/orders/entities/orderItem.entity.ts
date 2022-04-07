@@ -9,7 +9,7 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 @Entity()
 export class OrderItem extends Common {
   @Field((type) => Dish)
-  @ManyToOne(() => Dish, { nullable: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Dish, { nullable: true, onDelete: 'CASCADE', eager: true })
   @IsOptional()
   dish?: Dish;
 

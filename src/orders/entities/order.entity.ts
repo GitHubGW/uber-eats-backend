@@ -15,6 +15,7 @@ export class Order extends Common {
   @ManyToOne(() => Restaurant, (restaurant: Restaurant) => restaurant.restaurantOrders, {
     onDelete: 'SET NULL',
     nullable: true,
+    eager: true,
   })
   @IsOptional()
   restaurant?: Restaurant;
@@ -25,7 +26,7 @@ export class Order extends Common {
   restaurantId: number;
 
   @Field((type) => User, { nullable: true })
-  @ManyToOne(() => User, (user: User) => user.customerOrders, { onDelete: 'SET NULL', nullable: true })
+  @ManyToOne(() => User, (user: User) => user.customerOrders, { onDelete: 'SET NULL', nullable: true, eager: true })
   @IsOptional()
   customer?: User;
 
@@ -35,7 +36,7 @@ export class Order extends Common {
   customerId: number;
 
   @Field((type) => User, { nullable: true })
-  @ManyToOne(() => User, (user: User) => user.driverOrders, { onDelete: 'SET NULL', nullable: true })
+  @ManyToOne(() => User, (user: User) => user.driverOrders, { onDelete: 'SET NULL', nullable: true, eager: true })
   @IsOptional()
   driver?: User;
 
@@ -45,7 +46,7 @@ export class Order extends Common {
   driverId: number;
 
   @Field((type) => [OrderItem])
-  @ManyToMany(() => OrderItem)
+  @ManyToMany(() => OrderItem, { eager: true })
   @JoinTable()
   orderItems: OrderItem[];
 
