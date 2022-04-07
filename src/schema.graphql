@@ -375,3 +375,7 @@ input EditOrderInput {
   id: Float!
   status: Status = Pending
 }
+
+type Subscription {
+  pendingOrder: Order!
+}
