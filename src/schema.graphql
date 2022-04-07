@@ -51,6 +51,7 @@ type Order {
 enum Status {
   Pending
   Cooking
+  Cooked
   PickedUp
   Delivered
 }
@@ -378,4 +379,10 @@ input EditOrderInput {
 
 type Subscription {
   pendingOrder: Order!
+  cookedOrder: Order!
+  orderUpdate(input: OrderUpdateInput!): Order!
+}
+
+input OrderUpdateInput {
+  id: Float!
 }

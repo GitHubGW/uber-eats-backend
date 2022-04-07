@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PubSub } from 'graphql-subscriptions';
-import { NEW_PENDING_ORDER, PUB_SUB } from 'src/common/common.constants';
+import { COOKED_ORDER, ORDER_UPDATE, PENDING_ORDER, PUB_SUB } from 'src/common/common.constants';
 import { Dish, DishOption } from 'src/dishes/entities/dish.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -129,7 +129,7 @@ export class OrdersService {
         totalPrice: totalOrderPrice,
       });
       await this.ordersRepository.save(createdOrder);
-      await this.pubsub.publish(NEW_PENDING_ORDER, {
+      await this.pubsub.publish(PENDING_ORDER, {
         pendingOrder: { order: createdOrder, ownerId: foundRestaurant.ownerId },
       });
       return { ok: true, message: '주문 생성에 성공하였습니다.' };
@@ -141,7 +141,7 @@ export class OrdersService {
 
   async editOrder({ id, status }: EditOrderInput, loggedInUser: User): Promise<EditOrderOutput> {
     try {
-      const foundOrder: Order | undefined = await this.ordersRepository.findOne({ id }, { relations: ['restaurant'] });
+      const foundOrder: Order | undefined = await this.ordersRepository.findOne({ id });
 
       if (foundOrder === undefined) {
         return { ok: false, message: '존재하지 않는 주문입니다.' };
@@ -163,6 +163,12 @@ export class OrdersService {
         }
         if (foundOrder.status === Status.Pending || foundOrder.status === Status.Cooking) {
           await this.ordersRepository.save([{ id: foundOrder.id, status }]);
+          const updatedOrder = { ...foundOrder, status: Status.Cooked };
+
+          if (status === Status.Cooked) {
+            await this.pubsub.publish(COOKED_ORDER, { cookedOrder: updatedOrder });
+          }
+          await this.pubsub.publish(ORDER_UPDATE, { orderUpdate: updatedOrder });
         }
       }
 

@@ -2,11 +2,12 @@ import { Inject } from '@nestjs/common';
 import { Args, Context, Query, Mutation, Resolver, Subscription } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 import { Roles } from 'src/auth/roles.decorator';
-import { NEW_PENDING_ORDER, PUB_SUB } from 'src/common/common.constants';
+import { COOKED_ORDER, ORDER_UPDATE, PENDING_ORDER, PUB_SUB } from 'src/common/common.constants';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/role.enum';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/createOrder.dto';
 import { EditOrderInput, EditOrderOutput } from './dtos/editOrder.dto';
+import { OrderUpdateInput } from './dtos/orderUpdate.dto';
 import { SeeAllOrdersInput, SeeAllOrdersOutput } from './dtos/seeAllOrders.dto';
 import { SeeOrderInput, SeeOrderOutput } from './dtos/seeOrder.dto';
 import { Order } from './entities/order.entity';
@@ -54,8 +55,8 @@ export class OrdersResolver {
 
   @Roles([Role.Owner])
   @Subscription((returns) => Order, {
-    filter: (payload: any, variables: any, context: any): boolean => {
-      if (payload.pendingOrder.ownerId === context.loggedInUser.id) {
+    filter: (payload: any, variables: any, { loggedInUser }: { loggedInUser: User }): boolean => {
+      if (payload.pendingOrder.ownerId === loggedInUser.id) {
         return true;
       }
       return false;
@@ -66,6 +67,39 @@ export class OrdersResolver {
     },
   })
   pendingOrder() {
-    return this.pubsub.asyncIterator(NEW_PENDING_ORDER);
+    return this.pubsub.asyncIterator(PENDING_ORDER);
+  }
+
+  @Roles([Role.Driver])
+  @Subscription((returns) => Order)
+  cookedOrder() {
+    return this.pubsub.asyncIterator(COOKED_ORDER);
+  }
+
+  @Roles([Role.Any])
+  @Subscription((returns) => Order, {
+    filter: (
+      payload: any,
+      { input }: { input: OrderUpdateInput },
+      { loggedInUser }: { loggedInUser: User },
+    ): boolean => {
+      const {
+        orderUpdate: {
+          restaurant: { ownerId },
+          customerId,
+          driverId,
+        },
+      } = payload;
+
+      if (ownerId !== loggedInUser.id && customerId !== loggedInUser.id && driverId !== loggedInUser.id) {
+        return false;
+      }
+      if (payload.orderUpdate.id === input.id) {
+        return true;
+      }
+    },
+  })
+  orderUpdate(@Args('input') orderUpdateInput: OrderUpdateInput) {
+    return this.pubsub.asyncIterator(ORDER_UPDATE);
   }
 }
