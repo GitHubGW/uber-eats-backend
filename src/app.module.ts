@@ -1,10 +1,9 @@
 import * as Joi from 'joi';
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtMiddleware } from './jwt/jwt.middleware';
 import { User } from './users/entities/user.entity';
 import { Verification } from './users/entities/verification.entity';
 import { JwtModule } from './jwt/jwt.module';
@@ -23,6 +22,8 @@ import { Dish } from './dishes/entities/dish.entity';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/orderItem.entity';
+import { PaymentsModule } from './payments/payments.module';
+import { Payment } from './payments/entities/payment.entity';
 
 @Module({
   imports: [
@@ -67,7 +68,7 @@ import { OrderItem } from './orders/entities/orderItem.entity';
       database: process.env.DATABASE_NAME,
       synchronize: process.env.NODE_ENV === 'production' ? false : true,
       logging: false,
-      entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem],
+      entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem, Payment],
     }),
     JwtModule.forRoot({
       jwtSecretKey: process.env.JWT_SECRET_KEY,
@@ -83,6 +84,7 @@ import { OrderItem } from './orders/entities/orderItem.entity';
     CategoriesModule,
     DishesModule,
     OrdersModule,
+    PaymentsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
   controllers: [],

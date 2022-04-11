@@ -7,6 +7,7 @@ import { InternalServerErrorException, Res } from '@nestjs/common';
 import { Role } from '../enums/role.enum';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { Order } from 'src/orders/entities/order.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
@@ -53,6 +54,11 @@ export class User extends Common {
   @OneToMany(() => Order, (order: Order) => order.driver)
   @IsOptional()
   driverOrders?: Order[];
+
+  @Field((type) => [Payment])
+  @OneToMany(() => Payment, (payment: Payment) => payment.user)
+  @IsOptional()
+  payments?: Payment[];
 
   @BeforeInsert()
   @BeforeUpdate()

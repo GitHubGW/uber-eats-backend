@@ -56,6 +56,17 @@ enum Status {
   Delivered
 }
 
+type Payment {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  transactionId: Float!
+  user: User!
+  userId: Float!
+  restaurant: Restaurant!
+  restaurantId: Float!
+}
+
 type Category {
   id: Float!
   createdAt: DateTime!
@@ -78,6 +89,7 @@ type Restaurant {
   ownerId: Float!
   dishes: [Dish!]!
   restaurantOrders: [Order!]!
+  payments: [Payment!]!
 }
 
 type User {
@@ -92,6 +104,7 @@ type User {
   restaurants: [Restaurant!]!
   customerOrders: [Order!]!
   driverOrders: [Order!]!
+  payments: [Payment!]!
 }
 
 enum Role {

@@ -3,6 +3,7 @@ import { IsNumber, IsOptional, IsString, Length } from 'class-validator';
 import { Common } from 'src/common/entities/common.entity';
 import { Dish } from 'src/dishes/entities/dish.entity';
 import { Order } from 'src/orders/entities/order.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
@@ -50,4 +51,9 @@ export class Restaurant extends Common {
   @OneToMany(() => Order, (order: Order) => order.restaurant)
   @IsOptional()
   restaurantOrders?: Order[];
+
+  @Field((type) => [Payment])
+  @OneToMany(() => Payment, (payment: Payment) => payment.restaurant)
+  @IsOptional()
+  payments?: Payment[];
 }
