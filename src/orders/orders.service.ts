@@ -11,6 +11,7 @@ import { CreateOrderInput, CreateOrderOutput } from './dtos/createOrder.dto';
 import { EditOrderInput, EditOrderOutput } from './dtos/editOrder.dto';
 import { SeeAllOrdersInput, SeeAllOrdersOutput } from './dtos/seeAllOrders.dto';
 import { SeeOrderInput, SeeOrderOutput } from './dtos/seeOrder.dto';
+import { TakeOrderInput, TakeOrderOutput } from './dtos/takeOrder.dto';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/orderItem.entity';
 import { Status } from './enums/status.enum';
@@ -178,6 +179,7 @@ export class OrdersService {
         }
         if (foundOrder.status === Status.PickedUp) {
           await this.ordersRepository.save([{ id: foundOrder.id, status }]);
+          await this.pubsub.publish(ORDER_UPDATE, { orderUpdate: foundOrder });
         }
       }
 
@@ -185,6 +187,26 @@ export class OrdersService {
     } catch (error) {
       console.log('editOrder error');
       return { ok: false, message: '주문 수정에 실패하였습니다.' };
+    }
+  }
+
+  async takeOrder({ id }: TakeOrderInput, loggedInUser: User): Promise<TakeOrderOutput> {
+    try {
+      const foundOrder: Order | undefined = await this.ordersRepository.findOne({ id });
+      if (foundOrder === undefined) {
+        return { ok: false, message: '존재하지 않는 주문입니다.' };
+      }
+      if (foundOrder.driver) {
+        return { ok: false, message: '드라이버가 이미 존재합니다.' };
+      }
+      foundOrder.driver = loggedInUser;
+      foundOrder.driverId = loggedInUser.id;
+      await this.ordersRepository.save(foundOrder); // await this.ordersRepository.save([{ id, driver: loggedInUser }]);
+      await this.pubsub.publish(ORDER_UPDATE, { orderUpdate: foundOrder });
+      return { ok: true, message: '주문 받기에 성공하였습니다.' };
+    } catch (error) {
+      console.log('takeOrder error');
+      return { ok: false, message: '주문 받기에 실패하였습니다.' };
     }
   }
 }

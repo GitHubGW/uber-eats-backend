@@ -226,6 +226,11 @@ type SeeOrderOutput {
   order: Order
 }
 
+type TakeOrderOutput {
+  ok: Boolean!
+  message: String!
+}
+
 type Query {
   seeMe: User!
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
@@ -283,6 +288,7 @@ type Mutation {
   deleteDish(input: DeleteDishInput!): DeleteDishOutput!
   createOrder(input: CreateOrderInput!): CreateOrderOutput!
   editOrder(input: EditOrderInput!): EditOrderOutput!
+  takeOrder(input: TakeOrderInput!): TakeOrderOutput!
 }
 
 input SendPasswordResetInput {
@@ -375,6 +381,10 @@ input CreateOrderItemInput {
 input EditOrderInput {
   id: Float!
   status: Status = Pending
+}
+
+input TakeOrderInput {
+  id: Float!
 }
 
 type Subscription {

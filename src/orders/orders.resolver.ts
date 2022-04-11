@@ -10,6 +10,7 @@ import { EditOrderInput, EditOrderOutput } from './dtos/editOrder.dto';
 import { OrderUpdateInput } from './dtos/orderUpdate.dto';
 import { SeeAllOrdersInput, SeeAllOrdersOutput } from './dtos/seeAllOrders.dto';
 import { SeeOrderInput, SeeOrderOutput } from './dtos/seeOrder.dto';
+import { TakeOrderInput, TakeOrderOutput } from './dtos/takeOrder.dto';
 import { Order } from './entities/order.entity';
 import { OrdersService } from './orders.service';
 
@@ -53,6 +54,15 @@ export class OrdersResolver {
     return this.ordersService.editOrder(editOrderInput, loggedInUser);
   }
 
+  @Roles([Role.Driver])
+  @Mutation((returns) => TakeOrderOutput)
+  takeOrder(
+    @Args('input') takeOrderInput: TakeOrderInput,
+    @Context('loggedInUser') loggedInUser: User,
+  ): Promise<TakeOrderOutput> {
+    return this.ordersService.takeOrder(takeOrderInput, loggedInUser);
+  }
+
   @Roles([Role.Owner])
   @Subscription((returns) => Order, {
     filter: (payload: any, variables: any, { loggedInUser }: { loggedInUser: User }): boolean => {
@@ -84,14 +94,10 @@ export class OrdersResolver {
       { loggedInUser }: { loggedInUser: User },
     ): boolean => {
       const {
-        orderUpdate: {
-          restaurant: { ownerId },
-          customerId,
-          driverId,
-        },
+        orderUpdate: { restaurant, customerId, driverId },
       } = payload;
 
-      if (ownerId !== loggedInUser.id && customerId !== loggedInUser.id && driverId !== loggedInUser.id) {
+      if (restaurant.ownerId !== loggedInUser.id && customerId !== loggedInUser.id && driverId !== loggedInUser.id) {
         return false;
       }
       if (payload.orderUpdate.id === input.id) {
