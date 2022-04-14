@@ -60,7 +60,7 @@ type Payment {
   id: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
-  transactionId: Float!
+  transactionId: String!
   user: User!
   userId: Float!
   restaurant: Restaurant!
@@ -244,6 +244,17 @@ type TakeOrderOutput {
   message: String!
 }
 
+type CreatePaymentOutput {
+  ok: Boolean!
+  message: String!
+}
+
+type SeePaymentsOutput {
+  ok: Boolean!
+  message: String!
+  payments: [Payment!]
+}
+
 type Query {
   seeMe: User!
   seeProfile(input: SeeProfileInput!): SeeProfileOutput!
@@ -254,6 +265,7 @@ type Query {
   seeCategory(input: SeeCategoryInput!): SeeCategoryOutput!
   seeAllOrders(input: SeeAllOrdersInput!): SeeAllOrdersOutput!
   seeOrder(input: SeeOrderInput!): SeeOrderOutput!
+  seePayments: SeePaymentsOutput!
 }
 
 input SeeProfileInput {
@@ -302,6 +314,7 @@ type Mutation {
   createOrder(input: CreateOrderInput!): CreateOrderOutput!
   editOrder(input: EditOrderInput!): EditOrderOutput!
   takeOrder(input: TakeOrderInput!): TakeOrderOutput!
+  createPayment(input: CreatePaymentInput!): CreatePaymentOutput!
 }
 
 input SendPasswordResetInput {
@@ -398,6 +411,11 @@ input EditOrderInput {
 
 input TakeOrderInput {
   id: Float!
+}
+
+input CreatePaymentInput {
+  transactionId: String!
+  restaurantId: Float!
 }
 
 type Subscription {
