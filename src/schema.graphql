@@ -90,6 +90,8 @@ type Restaurant {
   dishes: [Dish!]!
   restaurantOrders: [Order!]!
   payments: [Payment!]!
+  isPromoted: Boolean!
+  promotedUntilDate: DateTime
 }
 
 type User {
@@ -249,7 +251,7 @@ type CreatePaymentOutput {
   message: String!
 }
 
-type SeePaymentsOutput {
+type SeeAllPaymentsOutput {
   ok: Boolean!
   message: String!
   payments: [Payment!]
@@ -265,7 +267,7 @@ type Query {
   seeCategory(input: SeeCategoryInput!): SeeCategoryOutput!
   seeAllOrders(input: SeeAllOrdersInput!): SeeAllOrdersOutput!
   seeOrder(input: SeeOrderInput!): SeeOrderOutput!
-  seePayments: SeePaymentsOutput!
+  seeAllPayments: SeeAllPaymentsOutput!
 }
 
 input SeeProfileInput {

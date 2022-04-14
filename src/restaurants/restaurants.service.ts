@@ -25,6 +25,7 @@ export class RestaurantsService {
       const foundAllRestaurants: Restaurant[] = await this.restaurantsRepository.find({
         skip: (page - 1) * TAKE_NUMBER,
         take: TAKE_NUMBER,
+        order: { isPromoted: 'DESC' },
       });
 
       return {
@@ -65,6 +66,7 @@ export class RestaurantsService {
         where: { name: ILike(`%${restaurantName}%`) },
         skip: (page - 1) * TAKE_NUMBER,
         take: TAKE_NUMBER,
+        order: { isPromoted: 'DESC' },
       });
 
       return {

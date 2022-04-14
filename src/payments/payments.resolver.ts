@@ -3,7 +3,7 @@ import { Roles } from 'src/auth/roles.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/role.enum';
 import { CreatePaymentInput, CreatePaymentOutput } from './dtos/createPayment.dto';
-import { SeePaymentsOutput } from './dtos/seePayments.dto';
+import { SeeAllPaymentsOutput } from './dtos/seeAllPayments.dto';
 import { Payment } from './entities/payment.entity';
 import { PaymentsService } from './payments.service';
 
@@ -11,10 +11,10 @@ import { PaymentsService } from './payments.service';
 export class PaymentsResolver {
   constructor(private readonly paymentsService: PaymentsService) {}
 
-  @Roles([Role.Customer])
-  @Query((returns) => SeePaymentsOutput)
-  seePayments(@Context('loggedInUser') loggedInUser: User): Promise<SeePaymentsOutput> {
-    return this.paymentsService.seePayments(loggedInUser);
+  @Roles([Role.Owner])
+  @Query((returns) => SeeAllPaymentsOutput)
+  seeAllPayments(@Context('loggedInUser') loggedInUser: User): Promise<SeeAllPaymentsOutput> {
+    return this.paymentsService.seeAllPayments(loggedInUser);
   }
 
   @Roles([Role.Owner])

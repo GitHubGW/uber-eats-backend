@@ -47,6 +47,7 @@ export class CategoriesService {
         where: { category: foundCategory },
         skip: (page - 1) * TAKE_NUMBER,
         take: TAKE_NUMBER,
+        order: { isPromoted: 'DESC' },
       });
       foundCategory.restaurants = foundRestaurants;
 

@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { IsNumber, IsOptional, IsString, Length } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString, Length } from 'class-validator';
 import { Common } from 'src/common/entities/common.entity';
 import { Dish } from 'src/dishes/entities/dish.entity';
 import { Order } from 'src/orders/entities/order.entity';
@@ -56,4 +56,14 @@ export class Restaurant extends Common {
   @OneToMany(() => Payment, (payment: Payment) => payment.restaurant)
   @IsOptional()
   payments?: Payment[];
+
+  @Field((type) => Boolean, { defaultValue: false })
+  @Column({ default: false })
+  @IsBoolean()
+  isPromoted: Boolean;
+
+  @Field((type) => Date, { nullable: true })
+  @Column({ nullable: true })
+  @IsOptional()
+  promotedUntilDate?: Date;
 }

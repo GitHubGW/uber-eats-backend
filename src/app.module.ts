@@ -24,6 +24,7 @@ import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/orderItem.entity';
 import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payment.entity';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { Payment } from './payments/entities/payment.entity';
       mailgunApiKey: process.env.MAILGUN_API_KEY,
       mailgunDomainName: process.env.MAILGUN_DOMAIN_NAME,
     }),
+    ScheduleModule.forRoot(),
     CommonModule,
     UsersModule,
     AuthModule,
